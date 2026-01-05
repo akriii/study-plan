@@ -4,14 +4,14 @@ from models import CourseCreate, CourseRead,Summary
 from utils import CountInProgress,Calc_Cgpa
 
 router = APIRouter()
-@router.get("/course/{student_id}/{semester_id}", response_model=list[CourseRead]) #@router is a sub mdodule of FastAPI to handle routes
+@router.get("/{student_id}/{semester_id}", response_model=list[CourseRead]) #@router is a sub mdodule of FastAPI to handle routes
 async def read_course(student_id:str, semester_id:str):
     response = SUPABASE.table("COURSE").select("*").eq("student_id",student_id).eq("semester_id",semester_id).execute()
     if not response.data:
         raise HTTPException(status_code=404, detail="Student not found")
     return response.data
 
-@router.post("/course/add") 
+@router.post("/add") 
 async def add_course(course: CourseCreate): 
     new_course = {
         "course_name": course.course_name,
@@ -31,7 +31,7 @@ async def add_course(course: CourseCreate):
     return response.data
 
 #route to get completed course
-@router.get("/course/completed/{student_id}", response_model=list[CourseRead])
+@router.get("/Completed/{student_id}", response_model=list[CourseRead])
 async def completed_course(student_id:str):
     response = SUPABASE.table("COURSE").select("*").eq("student_id",student_id).not_.eq("student_grade","In Progress").execute()
 
@@ -41,7 +41,7 @@ async def completed_course(student_id:str):
     return response.data
 
 #route to get in progress course
-@router.get("/course/InProgress/{student_id}", response_model=list[CourseRead])
+@router.get("/InProgress/{student_id}", response_model=list[CourseRead])
 async def in_progress_course(student_id:str):
 
     response = SUPABASE.table("COURSE").select("*").eq("student_id",student_id).eq("student_grade","In Progress").execute()
@@ -52,7 +52,7 @@ async def in_progress_course(student_id:str):
     return response.data
 
 #calculation
-@router.get("/course/Summary/{student_id}", response_model=Summary)
+@router.get("/Summary/{student_id}", response_model=Summary)
 async def summary(student_id:str):
 
     

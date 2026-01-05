@@ -6,7 +6,7 @@ from utils import HashPassword, VerifyPassword
 router = APIRouter() #defining a router for student-related routes
 
 #route to fetch student based on student id sent by react
-@router.get("/student/{student_id}", response_model=StudentRead) #@router is a sub mdodule of FastAPI to handle routes
+@router.get("/{student_id}", response_model=StudentRead) #@router is a sub mdodule of FastAPI to handle routes
 async def read_students(student_id:str):
     response = SUPABASE.table("STUDENT").select("*").eq("student_id",student_id).single().execute() #query for get all students data
     if not response.data:
@@ -51,7 +51,7 @@ async def login_student(student:StudentLogin):
         "student_id": user_record["student_id"]
     }
 
-@router.put("/student/update/{student_id}" ,response_model=StudentUpdate)
+@router.put("/update/{student_id}" ,response_model=StudentUpdate)
 async def update_student(student_id:str, student_data:StudentUpdate):
     data = student_data.model_dump(exclude_unset=True)
 
@@ -61,7 +61,7 @@ async def update_student(student_id:str, student_data:StudentUpdate):
     
     return response.data[0]
 
-@router.delete("/student/delete/{student_id}", response_model=StudentRemove)
+@router.delete("/delete/{student_id}", response_model=StudentRemove)
 async def delete_student(student_id:str, student_data:StudentRemove):
     
 
