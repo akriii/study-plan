@@ -7,20 +7,12 @@ class StudentLogin(BaseModel):
     student_password: str
 
 class CourseCreate(BaseModel):
-    course_name: str = Field(..., max_length=100)
+    course_name: str 
     credit_hour: float
-    student_grade: Optional[str] = "In Progress"
-    course_code: str = Field(..., max_length=10)
-    semester_id: int
-    student_id: str
-    prerequisite: str = Field(None, max_length=100)
-
-class SemesterRead(BaseModel):
-    semester_id: int
-    semester_name: str 
-    semester_gpa: float
-    student_id: str
-
+    student_grade: Optional[str] = "Null"
+    course_code: str 
+    semester: int
+    prerequisite: str 
 class StudentCreate(BaseModel):
     student_id: str
     student_name: str 
@@ -41,16 +33,9 @@ class CourseRead(BaseModel):
     course_name: str 
     credit_hour: float
     student_grade: str 
-    course_code: str = Field(..., max_length=10)
-    semester_id: int
+    course_code: str 
     student_id: str
     prerequisite: str 
-
-class SemesterCreate(BaseModel):
-    semester_id: str
-    semester_name: str
-    semester_gpa: str
-    student_id:str
 
 class Summary(BaseModel):
     
@@ -70,3 +55,9 @@ class StudentRemove(BaseModel):
     student_image: Optional[str] = None
     student_GOT: Optional[date] = None
     
+class StudentCourseAdd(BaseModel):
+    student_id: str
+    course_code: str
+    semester: int
+    grade: str
+    status: Optional[str] = "Null"
