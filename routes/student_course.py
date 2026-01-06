@@ -1,7 +1,7 @@
 from fastapi import FastAPI,APIRouter, HTTPException
-from database import SUPABASE
-from models import  CourseRead, Summary, StudentCourseAdd
-from utils import Calc_Cgpa, CountInProgress, Find_Prerequisite
+from Database.database import SUPABASE
+from Model.models import  CourseRead, Summary, StudentCourseAdd
+from Util.utils import Calc_Cgpa, CountInProgress
 
 router = APIRouter()
 @router.get("/get/{student_id}/{course_code}", response_model=list[CourseRead]) #@router is a sub mdodule of FastAPI to handle routes
@@ -46,7 +46,7 @@ async def add_student_course(course:StudentCourseAdd):
     return response.data[0]
 
 #route to get completed course
-@router.get("/Completed/{student_id}", response_model=list[CourseRead])
+@router.get("/Completed/{student_id}", response_model=list[CourseRead]) #use list because it returns multiple items of student course
 async def completed_course(student_id:str):
     response = SUPABASE.table("STUDENT_COURSE").select("*").eq("student_id",student_id).eq("status","Completed").execute()
 

@@ -1,7 +1,7 @@
 from fastapi import FastAPI,APIRouter, HTTPException
-from database import SUPABASE
-from models import CourseCreate, CourseRead,Summary
-from utils import CountInProgress,Calc_Cgpa
+from Database.database import SUPABASE
+from Model.models import CourseCreate, CourseRead,Summary
+from Util.utils import CountInProgress,Calc_Cgpa
 
 router = APIRouter()
 @router.get("/get/{course_code}", response_model=list[CourseRead]) #@router is a sub mdodule of FastAPI to handle routes

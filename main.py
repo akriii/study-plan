@@ -1,6 +1,6 @@
 from fastapi import FastAPI, HTTPException
-from database import SUPABASE
-from routes import student,course, student_course
+from Database.database import SUPABASE
+from Routes import student,course, student_course
 from fastapi.middleware.cors import CORSMiddleware
 
 app = FastAPI()

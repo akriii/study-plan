@@ -1,7 +1,7 @@
 from fastapi import FastAPI,APIRouter, HTTPException
-from database import SUPABASE
-from models import StudentCreate, StudentRead,StudentLogin, StudentUpdate, StudentRemove
-from utils import HashPassword, VerifyPassword
+from Database.database import SUPABASE
+from Model.models import StudentCreate, StudentRead,StudentLogin, StudentUpdate, StudentRemove
+from Util.utils import HashPassword, VerifyPassword
 
 router = APIRouter() #defining a router for student-related routes
 
