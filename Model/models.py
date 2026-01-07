@@ -18,8 +18,11 @@ class StudentCreate(BaseModel):
     student_name: str 
     student_email: EmailStr
     student_password: str 
+    student_image: Optional[str] = None
     student_GOT: Optional[date] = None
     
+class StudentCalcGOT(BaseModel):
+    student_GOT: date
 
 class StudentRead(BaseModel):
     student_id: str
@@ -29,7 +32,6 @@ class StudentRead(BaseModel):
     student_GOT: Optional[date] = None
     
 class CourseRead(BaseModel):
-    course_id: str
     course_name: str 
     credit_hour: float
     student_grade: str 
@@ -61,3 +63,23 @@ class StudentCourseAdd(BaseModel):
     semester: int
     grade: str
     status: Optional[str] = "Null"
+
+class CourseType(BaseModel):
+    course_type: str
+
+class ReadSemesterCourse(BaseModel):
+    semester: int
+    course_code: str
+    student_id: str
+    grade: str
+    status: str
+    COURSE: CourseRead
+
+class UpdateStudentCourse(BaseModel):
+    course_code: str
+    grade: str
+    status: str
+    semester: int
+
+class SemesterRemove(BaseModel):
+    message:str
