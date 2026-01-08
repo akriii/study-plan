@@ -27,12 +27,13 @@ async def register_student(student:StudentCreate):
     response = SUPABASE.table("STUDENT").insert(new_student).execute() 
     return response.data
 
-@router.post("/register_got")
-async def register_got(student:StudentCalcGOT):
-    got = {
-        "student_GOT": student.student_GOT
-    }
-    response = SUPABASE.table("STUDENT").insert(got).execute() 
+#route for calc student graduate on time
+@router.put("/update_got/{student_id}") # Use PUT for existing data
+async def update_got(student_id: UUID, data: StudentCalcGOT):
+    response = SUPABASE.table("STUDENT") \
+        .update({"student_GOT": data.student_GOT}) \
+        .eq("student_id", student_id) \
+        .execute()
     return response.data
 
 # Route for student login
