@@ -2,10 +2,11 @@ from fastapi import FastAPI,APIRouter, HTTPException
 from Database.database import SUPABASE
 from Model.models import  CourseRead, Summary, StudentCourseAdd, ReadSemesterCourse, UpdateStudentCourse, SemesterRemove
 from Services.utils import Calc_Cgpa, CountInProgress
+from uuid import UUID
 
 router = APIRouter()
 @router.get("/get/{student_id}/{course_code}", response_model=list[CourseRead]) #@router is a sub mdodule of FastAPI to handle routes
-async def read_student_course(student_id:str, course_code:str):
+async def read_student_course(student_id:UUID, course_code:str):
     response = SUPABASE.table("STUDENT_COURSE").select("*").eq("student_id",student_id).eq("course_code",course_code).execute()
     if not response.data:
         raise HTTPException(status_code=404, detail="Record not found")
@@ -46,7 +47,7 @@ async def add_student_course(course:StudentCourseAdd):
 
 #route to get completed course
 @router.get("/Completed/{student_id}", response_model=list[CourseRead]) #use list because it returns multiple items of student course
-async def completed_course(student_id:str):
+async def completed_course(student_id:UUID):
     response = SUPABASE.table("STUDENT_COURSE").select("*").eq("student_id",student_id).eq("status","Completed").execute()
 
     if not response.data:
@@ -55,7 +56,7 @@ async def completed_course(student_id:str):
 
 #route to get in progress course
 @router.get("/InProgress/{student_id}", response_model=list[CourseRead])
-async def in_progress_course(student_id:str):
+async def in_progress_course(student_id:UUID):
     response = SUPABASE.table("STUDENT_COURSE").select("*").eq("student_id",student_id).eq("status","In Progress").execute()
 
     if not response.data:
@@ -64,7 +65,7 @@ async def in_progress_course(student_id:str):
 
 #calculation
 @router.get("/Summary/{student_id}", response_model=Summary)
-async def summary(student_id:str):
+async def summary(student_id:UUID):
     response = SUPABASE.table("STUDENT_COURSE").select("*").eq("student_id",student_id).execute()
 
     course = response.data
@@ -91,7 +92,7 @@ async def get_semester_course(student_id: str, semester: int):
 
 #edit student course details
 @router.put("/update/StudentCourse/{student_id}/{course_code}", response_model=list[UpdateStudentCourse])
-async def edit_student_course(student_id:str, course_code:int, studentcourse_data: UpdateStudentCourse ):
+async def edit_student_course(student_id:UUID, course_code:int, studentcourse_data: UpdateStudentCourse ):
     data = studentcourse_data.model_dump(exclude_unset=True)
 
     response = SUPABASE.table("STUDENT_COURSE").update(data).eq("student_id",student_id).eq("course_code",course_code).execute()
@@ -101,7 +102,7 @@ async def edit_student_course(student_id:str, course_code:int, studentcourse_dat
     return response.data
 #delete entire semester
 @router.delete("/delete/{student_id}/{semester}" ,response_model=SemesterRemove)
-async def delete_semester(student_id:str, semester: int):
+async def delete_semester(student_id:UUID, semester: int):
     
 
     response = SUPABASE.table("STUDENT_COURSE").delete().eq("student_id",student_id).eq("semester", semester).execute()
@@ -112,7 +113,7 @@ async def delete_semester(student_id:str, semester: int):
 
 #delete course based on semester
 @router.delete("/delete/{student_id}/{semester}/{course_code}", response_model=SemesterRemove)
-async def delete_semester_course(student_id:str, course_code:str, semester: int):
+async def delete_semester_course(student_id:UUID, course_code:str, semester: int):
     
 
     response = SUPABASE.table("STUDENT_COURSE").delete().eq("student_id",student_id).eq("course_code", course_code).eq("semester",semester).execute()

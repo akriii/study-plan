@@ -9,8 +9,11 @@ app = FastAPI()
 origins = [
     "http://localhost:3000",  
     "http://127.0.0.1:3000",  
-    "http://localhost:8000",  
-
+    "http://localhost:8000", 
+    "http://localhost:5173",
+    "http://172.16.142.136",   
+    "http://172.16.142.4",             # The IP appearing in your logs
+    "*",
 ]
 #adding CORS middleware to handle cross-origin requests
 app.add_middleware(

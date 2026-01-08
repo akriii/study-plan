@@ -1,6 +1,7 @@
 from pydantic import BaseModel, EmailStr, Field
 from datetime import date
 from typing import Optional
+from uuid import UUID
 
 class StudentLogin(BaseModel):
     student_email: EmailStr
@@ -14,7 +15,6 @@ class CourseCreate(BaseModel):
     semester: int
     prerequisite: str 
 class StudentCreate(BaseModel):
-    student_id: str
     student_name: str 
     student_email: EmailStr
     student_password: str 
@@ -25,7 +25,7 @@ class StudentCalcGOT(BaseModel):
     student_GOT: date
 
 class StudentRead(BaseModel):
-    student_id: str
+    student_id: UUID
     student_email: EmailStr
     student_name: str
     student_image: Optional[str] = None
@@ -42,15 +42,15 @@ class CourseRead(BaseModel):
 class Summary(BaseModel):
     
     count_course: int
-    student_grade: float
+    student_cgpa: float
    
 class StudentUpdate(BaseModel):
-    student_id: str
+    student_id: UUID
     student_image: str
     student_name: str
 
 class StudentRemove(BaseModel):
-    student_id: str
+    student_id: UUID
     student_name: str 
     student_email: EmailStr
     student_password: str 
@@ -58,7 +58,7 @@ class StudentRemove(BaseModel):
     student_GOT: Optional[date] = None
     
 class StudentCourseAdd(BaseModel):
-    student_id: str
+    student_id: UUID
     course_code: str
     semester: int
     grade: str
@@ -70,7 +70,7 @@ class CourseType(BaseModel):
 class ReadSemesterCourse(BaseModel):
     semester: int
     course_code: str
-    student_id: str
+    student_id: UUID
     grade: str
     status: str
     COURSE: CourseRead

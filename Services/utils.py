@@ -1,6 +1,7 @@
 from passlib.context import CryptContext
 
 
+
 pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
 def HashPassword(password:str):
     safe_password = password[:72] #72 bytes of password hashed only

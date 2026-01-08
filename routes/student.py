@@ -2,12 +2,12 @@ from fastapi import FastAPI,APIRouter, HTTPException
 from Database.database import SUPABASE
 from Model.models import StudentCreate, StudentRead,StudentLogin, StudentUpdate, StudentRemove, StudentCalcGOT
 from Services.utils import HashPassword, VerifyPassword
-
+from uuid import UUID
 router = APIRouter() #defining a router for student-related routes
 
 #route to fetch student based on student id sent by react
 @router.get("/{student_id}", response_model=StudentRead) #@router is a sub mdodule of FastAPI to handle routes
-async def read_students(student_id:str):
+async def read_students(student_id:UUID):
     response = SUPABASE.table("STUDENT").select("*").eq("student_id",student_id).single().execute() #query for get all students data
     if not response.data:
         raise HTTPException(status_code=404, detail="Student not found")
@@ -15,12 +15,11 @@ async def read_students(student_id:str):
     return response.data
 
 # Route to add a new student
-@router.post("/register")  
+@router.post("/register", response_model=StudentRead)  
 async def register_student(student:StudentCreate):
     raw_password = student.student_password
     hashed = HashPassword(raw_password)
     new_student = {
-        "student_id": student.student_id,
         "student_name": student.student_name,
         "student_email": student.student_email,
         "student_password": hashed,
@@ -59,7 +58,7 @@ async def login_student(student:StudentLogin):
     }
 
 @router.put("/update/{student_id}" ,response_model=StudentUpdate)
-async def update_student(student_id:str, student_data:StudentUpdate):
+async def update_student(student_id:UUID, student_data:StudentUpdate):
     data = student_data.model_dump(exclude_unset=True)
 
     response = SUPABASE.table("STUDENT").update(data).eq("student_id",student_id).execute()
@@ -69,7 +68,7 @@ async def update_student(student_id:str, student_data:StudentUpdate):
     return response.data[0]
 
 @router.delete("/delete/{student_id}", response_model=StudentRemove)
-async def delete_student(student_id:str):
+async def delete_student(student_id:UUID):
     
 
     response = SUPABASE.table("STUDENT").delete().eq("student_id",student_id).execute()
