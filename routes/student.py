@@ -28,7 +28,7 @@ async def register_student(student:StudentCreate):
     return response.data
 
 #route for calc student graduate on time
-@router.put("/update_got/{student_id}") # Use PUT for existing data
+@router.put("/update_got/{student_id}") 
 async def update_got(student_id: UUID, data: StudentCalcGOT):
     response = SUPABASE.table("STUDENT") \
         .update({"student_GOT": data.student_GOT}) \
@@ -58,6 +58,7 @@ async def login_student(student:StudentLogin):
         "student_id": user_record["student_id"]
     }
 
+#routef for update student information
 @router.put("/update/{student_id}" ,response_model=StudentUpdate)
 async def update_student(student_id:UUID, student_data:StudentUpdate):
     data = student_data.model_dump(exclude_unset=True)
@@ -68,6 +69,7 @@ async def update_student(student_id:UUID, student_data:StudentUpdate):
     
     return response.data[0]
 
+#route for delete student id
 @router.delete("/delete/{student_id}", response_model=StudentRemove)
 async def delete_student(student_id:UUID):
     
