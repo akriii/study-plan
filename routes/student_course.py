@@ -5,11 +5,32 @@ from Services.utils import Calc_Cgpa, CountInProgress
 from uuid import UUID
 
 router = APIRouter()
-@router.get("/get/{student_id}/{course_code}", response_model=list[CourseRead]) #@router is a sub mdodule of FastAPI to handle routes
-async def read_student_course(student_id:UUID, course_code:str):
-    response = SUPABASE.table("STUDENT_COURSE").select("*").eq("student_id",student_id).eq("course_code",course_code).execute()
+#route to get sepcific student_course data
+@router.get("/get/{student_id}/{course_code}", response_model=list[ReadSemesterCourse]) #@router is a sub mdodule of FastAPI to handle routes
+async def read_student_course_specific(student_id:UUID, course_code:str):
+    response = SUPABASE.table("STUDENT_COURSE").select("*, COURSE(course_name, credit_hours, course_type").eq("student_id",student_id).eq("course_code",course_code).execute() #query to get student_course and course data based on course_code
     if not response.data:
         raise HTTPException(status_code=404, detail="Record not found")
+    return response.data
+
+#route to get all student_course data
+@router.get("/get/{student_id}", response_model=list[ReadSemesterCourse]) 
+async def read_student_course_all(student_id:UUID):
+    response = SUPABASE.table("STUDENT_COURSE").select("*").eq("student_id",student_id).execute()
+    if not response.data:
+        raise HTTPException(status_code=404, detail="Record not found")
+    return response.data
+
+#get list of course taken by each semester
+@router.get("/get/SemesterCourse/{student_id}/{semester}", response_model=list[ReadSemesterCourse])
+async def get_semester_course(student_id: str, semester: int):
+    response = SUPABASE.table("STUDENT_COURSE") \
+    .select("*, COURSE(course_name, credit_hours, course_type)")  \
+    .eq("student_id", student_id) \
+    .eq("semester", semester) \
+    .execute()
+    if not response.data:
+        return []
     return response.data
 
 @router.post("/add" )  # Route to add a new course
@@ -46,7 +67,7 @@ async def add_student_course(course:StudentCourseAdd):
     return response.data[0]
 
 #route to get completed course
-@router.get("/Completed/{student_id}", response_model=list[CourseRead]) #use list because it returns multiple items of student course
+@router.get("/Completed/{student_id}", response_model=list[ReadSemesterCourse]) #use list because it returns multiple items of student course
 async def completed_course(student_id:UUID):
     response = SUPABASE.table("STUDENT_COURSE").select("*").eq("student_id",student_id).eq("status","Completed").execute()
 
@@ -55,7 +76,7 @@ async def completed_course(student_id:UUID):
     return response.data
 
 #route to get in progress course
-@router.get("/InProgress/{student_id}", response_model=list[CourseRead])
+@router.get("/InProgress/{student_id}", response_model=list[ReadSemesterCourse])
 async def in_progress_course(student_id:UUID):
     response = SUPABASE.table("STUDENT_COURSE").select("*").eq("student_id",student_id).eq("status","In Progress").execute()
 
@@ -78,17 +99,8 @@ async def summary(student_id:UUID):
     count_in_progress = CountInProgress(in_progress_list)
     return {"count_course":count_in_progress,
             "student_cgpa":cgpa}
-#get list of course taken by each semester
-@router.get("/get/SemesterCourse/{student_id}/{semester}", response_model=list[ReadSemesterCourse])
-async def get_semester_course(student_id: str, semester: int):
-    response = SUPABASE.table("STUDENT_COURSE") \
-    .select("*, COURSE(course_name, credit_hours, course_type)")  \
-    .eq("student_id", student_id) \
-    .eq("semester", semester) \
-    .execute()
-    if not response.data:
-        return []
-    return response.data
+
+
 
 #edit student course details
 @router.put("/update/StudentCourse/{student_id}/{course_code}", response_model=list[UpdateStudentCourse])

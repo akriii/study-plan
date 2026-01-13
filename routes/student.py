@@ -58,7 +58,7 @@ async def login_student(student:StudentLogin):
         "student_id": user_record["student_id"]
     }
 
-#routef for update student information
+#route for update student information
 @router.put("/update/{student_id}" ,response_model=StudentUpdate)
 async def update_student(student_id:UUID, student_data:StudentUpdate):
     data = student_data.model_dump(exclude_unset=True)
