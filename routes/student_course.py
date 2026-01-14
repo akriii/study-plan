@@ -33,38 +33,55 @@ async def get_semester_course(student_id: str, semester: int):
         return []
     return response.data
 
-@router.post("/add" )  # Route to add a new course
-async def add_student_course(course:StudentCourseAdd):
-    #pre requisite calc
-    course_info = SUPABASE.table("COURSE").select("pre_requisite").eq("course_code",course.course_code).single().execute()
-    if not course_info.data:
-        raise HTTPException(status_code=404, detail="No pre-requisite found")
+#add new student_course
+@router.post("/add")
+async def add_student_course(course: StudentCourseAdd):
+    course_query = SUPABASE.table("COURSE").select("pre_requisite").eq("course_code", course.course_code).single().execute()
     
-    prerequisite_code = course_info.data.get("pre_requisite")
-    if prerequisite_code:
-        history = SUPABASE.table("STUDENT_COURSE") \
-            .select("grade, status") \
-            .eq("student_id", course.student_id) \
-            .eq("course_code", prerequisite_code) \
-            .execute()
-    
-        if not history.data:
-            raise HTTPException(status_code=400, detail=f"Prerequisite {prerequisite_code} not taken")
-        student_history = history.data[0]
-        if student_history["grade"] == "F" or student_history["status"] != "Completed":
-            raise HTTPException(status_code=400, detail=f"Prerequisite {prerequisite_code} not passed")
-    
-    if course.grade == "F":
-        raise HTTPException(status_code=400, detail="Cannot enroll with a failing grade")
-    new_course = {
-        "student_id": course.student_id,
+    if not course_query.data:
+        raise HTTPException(status_code=404, detail="Course code not found in system")
+    pre_reqs = course_query.data.get("pre_requisite")
+
+    if isinstance(pre_reqs, str):
+        pre_reqs = [pre_reqs]
+    elif pre_reqs is None:
+        pre_reqs = []
+
+    if pre_reqs:
+        for pre_code in pre_reqs:
+            if not pre_code: continue 
+
+            history = SUPABASE.table("STUDENT_COURSE").select("grade, status") \
+                .eq("student_id", course.student_id) \
+                .eq("course_code", pre_code).execute()
+            
+            if not history.data:
+                raise HTTPException(status_code=400, detail=f"Cannot enroll. Prerequisite {pre_code} has not been taken.")
+            
+            record = history.data[0]
+            
+            is_failed = record["grade"] in ["F", "f", "Fail", "FAIL"]
+            is_not_finished = record["status"] != "Completed"
+
+            if is_failed or is_not_finished:
+                raise HTTPException(
+                    status_code=400, 
+                    detail=f"Requirement Unmet: {pre_code} must be 'Completed' and 'Passed' first."
+                )
+            
+    new_enrollment = {
+        "student_id": str(course.student_id),
         "course_code": course.course_code,
         "semester": course.semester,
         "grade": course.grade,
         "status": course.status
     }
-    response = SUPABASE.table("STUDENT_COURSE").insert(new_course).execute()
-    return response.data[0]
+    
+    try:
+        response = SUPABASE.table("STUDENT_COURSE").insert(new_enrollment).execute()
+        return response.data[0]
+    except Exception as e:
+        raise HTTPException(status_code=400, detail="Failed to add course. It might already exist in your records.")
 
 #route to get completed course
 @router.get("/Completed/{student_id}", response_model=list[ReadSemesterCourse]) #use list because it returns multiple items of student course

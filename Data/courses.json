@@ -1,4 +1,472 @@
 [
+{
+    "course_code": "VFB4073",
+    "course_name": "Final Year Project 1",
+    "credit_hour": 2.0,
+    "pre_requisite": ["IFB3037","IFB3047"],
+    "course_type": "CD"
+},
+{
+    "course_code": "VFB4094",
+    "course_name": "Final Year Project 2",
+    "credit_hour": 4.0,
+    "pre_requisite": ["VFB4073"],
+    "course_type": "CD"
+},
+{
+    "course_code": "VFB4042",
+    "course_name": "Civil Engineering Design 1",
+    "credit_hour": 2.0,
+    "pre_requisite": ["IFB3037","IFB3047"],
+    "course_type": "CD"
+},
+{
+    "course_code": "VFB4063",
+    "course_name": "Civil Engineering Design 2",
+    "credit_hour": 3.0,
+    "pre_requisite": ["VFB4042"],
+    "course_type": "CD"
+},
+{
+    "course_code": "VFB4013",
+    "course_name": "Construction Project Management",
+    "credit_hour": 3.0,
+    "pre_requisite": [],
+    "course_type": "CD"
+},
+{
+    "course_code": "VFB4022",
+    "course_name": "Design of Reinforced Concrete Structures 2",
+    "credit_hour": 2.0,
+    "pre_requisite": ["VFB2033"],
+    "course_type": "CD"
+},
+{
+    "course_code": "VFB4032",
+    "course_name": "Building Information Modelling",
+    "credit_hour": 2.0,
+    "pre_requisite": [],
+    "course_type": "CD"
+},
+{
+    "course_code": "VFB4082",
+    "course_name": "Computational Methods for Civil Engineers",
+    "credit_hour": 2.0,
+    "pre_requisite": [],
+    "course_type": "CD"
+},
+{
+    "course_code": "VFB4052",
+    "course_name": "Design of Earth Retaining Structure",
+    "credit_hour": 2.0,
+    "pre_requisite": ["VFB3042"],
+    "course_type": "CD"
+},
+{
+    "course_code": "VFB2102",
+    "course_name": "Water Supply Engineering",
+    "credit_hour": 2.0,
+    "pre_requisite": [],
+    "course_type": "CD"
+},
+{
+    "course_code": "VFB3012",
+    "course_name": "Civil Engineering Laboratory 3",
+    "credit_hour": 2.0,
+    "pre_requisite": ["VFB2073"],
+    "course_type": "CD"
+},
+{
+    "course_code": "VFB3022",
+    "course_name": "Design of Reinforced Concrete Structures 1",
+    "credit_hour": 2.0,
+    "pre_requisite": ["VFB2033"],
+    "course_type": "CD"
+},
+{
+    "course_code": "VFB3033",
+    "course_name": "Wastewater Engineering",
+    "credit_hour": 3.0,
+    "pre_requisite": [],
+    "course_type": "CD"
+},
+{
+    "course_code": "VFB3042",
+    "course_name": "Design of Foundation",
+    "credit_hour": 2.0,
+    "pre_requisite": ["VFB2023"],
+    "course_type": "CD"
+},
+{
+    "course_code": "VFB2052",
+    "course_name": "Civil Engineering Laboratory 1",
+    "credit_hour": 2.0,
+    "pre_requisite": ["VFB2012","VFB2023","VFB1063"],
+    "course_type": "CD"
+},
+{
+    "course_code": "VFB2063",
+    "course_name": "Hydrology",
+    "credit_hour": 3.0,
+    "pre_requisite": ["FFM1063"],
+    "course_type": "CD"
+},
 
-    
+{
+    "course_code": "VFB2073",
+    "course_name": "Highway Engineering",
+    "credit_hour": 3.0,
+    "pre_requisite": [],
+    "course_type": "CD"
+},
+{
+    "course_code": "VFB2082",
+    "course_name": "Design of Steel Structures",
+    "credit_hour": 2.0,
+    "pre_requisite": ["VFB2033"],
+    "course_type": "CD"
+},
+{
+    "course_code": "VFB2092",
+    "course_name": "Civil Engineering Laboratory 2",
+    "credit_hour": 2.0,
+    "pre_requisite": ["VFB1052","VFB2043","VFB2063"],
+    "course_type": "CD"
+},
+{
+    "course_code": "VFB1063",
+    "course_name": "Theory of Structures",
+    "credit_hour": 3.0,
+    "pre_requisite": ["VFB1033"],
+    "course_type": "CD"
+},
+{
+    "course_code": "VFB1072",
+    "course_name": "Traffic Engineering",
+    "credit_hour": 2.0,
+    "pre_requisite": [],
+    "course_type": "CD"
+},
+{
+    "course_code": "VFB2012",
+    "course_name": "Sustainable Concrete Technology",
+    "credit_hour": 2.0,
+    "pre_requisite": [],
+    "course_type": "CD"
+},
+{
+    "course_code": "VFB2023",
+    "course_name": "Soil Mechanics",
+    "credit_hour": 3.0,
+    "pre_requisite": ["VFB1033"],
+    "course_type": "CD"
+},
+{
+    "course_code": "VFB2033",
+    "course_name": "Structural Analysis",
+    "credit_hour": 3.0,
+    "pre_requisite": ["VFB1063"],
+    "course_type": "CD"
+},
+{
+    "course_code": "VFB2043",
+    "course_name": "Hydraulics",
+    "credit_hour": 3.0,
+    "pre_requisite": ["VFB1052"],
+    "course_type": "CD"
+},
+{
+    "course_code": "VFB1012",
+    "course_name": "Civil Engineering Drawing",
+    "credit_hour": 2.0,
+    "pre_requisite": [],
+    "course_type": "CD"
+},
+{
+    "course_code": "VFB1023",
+    "course_name": "Engineering Mechanics",
+    "credit_hour": 3.0,
+    "pre_requisite": [],
+    "course_type": "CD"
+},
+{
+    "course_code": "VFB1033",
+    "course_name": "Mechanics of Solids",
+    "credit_hour": 3.0,
+    "pre_requisite": ["VFB1023"],
+    "course_type": "CD"
+},
+{
+    "course_code": "VFB1043",
+    "course_name": "Geomatics",
+    "credit_hour": 3.0,
+    "pre_requisite": [],
+    "course_type": "CD"
+},
+{
+    "course_code": "VFB1052",
+    "course_name": "Civil Engineering Fluid Mechanics",
+    "credit_hour": 2.0,
+    "pre_requisite": ["VFB1023"],
+    "course_type": "CD"
+},
+{
+    "course_code": "MFB4123",
+    "course_name": "Energy Management & Environment",
+    "credit_hour": 3.0,
+    "pre_requisite": [],
+    "course_type": "CSp"
+},
+{
+    "course_code": "MFB4513",
+    "course_name": "Renewable Energy 1",
+    "credit_hour": 3.0,
+    "pre_requisite": [],
+    "course_type": "CSp"
+},
+{
+    "course_code": "MFB4523",
+    "course_name": "Renewable Energy 2",
+    "credit_hour": 3.0,
+    "pre_requisite": [],
+    "course_type": "CSp"
+},
+{
+    "course_code": "VFB4233",
+    "course_name": "Air Pollution Prevention and Control",
+    "credit_hour": 3.0,
+    "pre_requisite": ["IFB3037","IFB3047"],
+    "course_type": "CSp"
+},
+{
+    "course_code": "VFB4413",
+    "course_name": "Construction Materials ans Sustainability",
+    "credit_hour": 3.0,
+    "pre_requisite": ["IFB3037","IFB3047"],
+    "course_type": "CSp"
+},
+{
+    "course_code": "VFB4423",
+    "course_name": "Low Carbon Building Design and Construction",
+    "credit_hour": 3.0,
+    "pre_requisite": ["IFB3037","IFB3047"],
+    "course_type": "CSp"
+},
+{
+    "course_code": "VFB4433",
+    "course_name": "Sustainable Transport Infrastructure Engineering",
+    "credit_hour": 3.0,
+    "pre_requisite": ["IFB3037","IFB3047"],
+    "course_type": "CSp"
+},
+{
+    "course_code": "VFB4113",
+    "course_name": "Fixed Offshore Structures",
+    "credit_hour": 3.0,
+    "pre_requisite": ["IFB3037","IFB3047","VFB2033"],
+    "course_type": "CSp"
+},
+{
+    "course_code": "VFB4133",
+    "course_name": "Offshore Project Management",
+    "credit_hour": 3.0,
+    "pre_requisite": ["IFB3037","IFB3047"],
+    "course_type": "CSp"
+},
+{
+    "course_code": "VFB4123",
+    "course_name": "Wave Hydrodynamics",
+    "credit_hour": 3.0,
+    "pre_requisite": ["IFB3037","IFB3047"],
+    "course_type": "CSp"
+},
+{
+    "course_code": "VFB4213",
+    "course_name": "Sludge Management and Disposal",
+    "credit_hour": 3.0,
+    "pre_requisite": ["IFB3037","IFB3047"],
+    "course_type": "CSp"
+},
+{
+    "course_code": "VFB4223",
+    "course_name": "Advanced Physical - Chemical Treatment Technologies",
+    "credit_hour": 3.0,
+    "pre_requisite": ["IFB3037","IFB3047"],
+    "course_type": "CSp"
+},
+{
+    "course_code": "MPU3182",
+    "course_name": "Penghayatan Etika & Peradaban",
+    "credit_hour": 2.0,
+    "pre_requisite": [],
+    "course_type": "NR"
+},
+{
+    "course_code": "MPU3142",
+    "course_name": "BM Komunikasi 2 (International)",
+    "credit_hour": 2.0,
+    "pre_requisite": [],
+    "course_type": "NR"
+},
+{
+    "course_code": "PFB1012",
+    "course_name": "Introduction to Oil & Gas Industry and Sustainable Development",
+    "credit_hour": 2.0,
+    "pre_requisite": [],
+    "course_type": "UR"
+},
+{
+    "course_code": "HFB2152",
+    "course_name": "Ethics and Integrity",
+    "credit_hour": 2.0,
+    "pre_requisite": [],
+    "course_type": "UR"
+},
+{
+    "course_code": "FFM1013",
+    "course_name": "Engineering Mathematics 1",
+    "credit_hour": 3.0,
+    "pre_requisite": [],
+    "course_type": "CC"
+},
+{
+    "course_code": "FFM1063",
+    "course_name": "Statistics and Application",
+    "credit_hour": 3.0,
+    "pre_requisite": [],
+    "course_type": "CC"
+},
+{
+    "course_code": "MPU3192",
+    "course_name": "Falsafah & Isu Semasa (FIS)",
+    "credit_hour": 2.0,
+    "pre_requisite": [],
+    "course_type": "NR"
+},
+{
+    "course_code": "FFM1023",
+    "course_name": "Engineering Mathematics 2",
+    "credit_hour": 3.0,
+    "pre_requisite": [],
+    "course_type": "CC"
+},
+{
+    "course_code": "CFB1032",
+    "course_name": "Health, Safety & Environment",
+    "credit_hour": 2.0,
+    "pre_requisite": [],
+    "course_type": "CC"
+},
+{
+    "course_code": "Co Curriculum 1",
+    "course_name": "Co Curriculum 1",
+    "credit_hour": 1.0,
+    "pre_requisite": [],
+    "course_type": "UR"
+},
+{
+    "course_code": "LFB1042",
+    "course_name": "Academic Writing",
+    "credit_hour": 2.0,
+    "pre_requisite": [],
+    "course_type": "UR"
+},
+{
+    "course_code": "HFB1022",
+    "course_name": "Scientific Inquiry",
+    "credit_hour": 2.0,
+    "pre_requisite": [],
+    "course_type": "UR"
+},
+{
+    "course_code": "HFB2033",
+    "course_name": "Professional Communication Skills Course",
+    "credit_hour": 3.0,
+    "pre_requisite": [],
+    "course_type": "UR"
+},
+{
+    "course_code": "MPU2",
+    "course_name": "MPU2 Course",
+    "credit_hour": 2.0,
+    "pre_requisite": [],
+    "course_type": "NR"
+},
+{
+    "course_code": "FFM2063",
+    "course_name": "Data Analytics",
+    "credit_hour": 3.0,
+    "pre_requisite": [],
+    "course_type": "CC"
+},
+{
+    "course_code": "GFB2102",
+    "course_name": "Entrepreneurship",
+    "credit_hour": 2.0,
+    "pre_requisite": [],
+    "course_type": "UR"
+},
+{
+    "course_code": "MFB2061",
+    "course_name": "Engineering Team Project 1",
+    "credit_hour": 1.0,
+    "pre_requisite": [],
+    "course_type": "CC"
+},
+{
+    "course_code": "MPU4",
+    "course_name": "Community Engagement Project",
+    "credit_hour": 2.0,
+    "pre_requisite": [],
+    "course_type": "NR"
+},
+{
+    "course_code": "MFB2062",
+    "course_name": "Engineering Team Project 2",
+    "credit_hour": 2.0,
+    "pre_requisite": [],
+    "course_type": "CC"
+},
+{
+    "course_code": "MPU3",
+    "course_name": "MPU3 Courses",
+    "credit_hour": 2.0,
+    "pre_requisite": [],
+    "course_type": "NR"
+},
+{
+    "course_code": "Co Curriculum 2",
+    "course_name": "Co Curriculum 2",
+    "credit_hour": 1.0,
+    "pre_requisite": [],
+    "course_type": "UR"
+},
+{
+    "course_code": "IFB3037",
+    "course_name": "Student Industrial Training (SIT)",
+    "credit_hour": 7.0,
+    "pre_requisite": [],
+    "course_type": "CI"
+},
+{
+    "course_code": "IFB3047",
+    "course_name": "Student Industrial Project (SIP)",
+    "credit_hour": 7.0,
+    "pre_requisite": [],
+    "course_type": "CI"
+},
+{
+    "course_code": "PFB4102",
+    "course_name": "Engineering Economics",
+    "credit_hour": 2.0,
+    "pre_requisite": [],
+    "course_type": "CC"
+},
+{
+    "course_code": "EFB4073",
+    "course_name": "Engineers in Society",
+    "credit_hour": 3.0,
+    "pre_requisite": [],
+    "course_type": "CC"
+}
 ]
