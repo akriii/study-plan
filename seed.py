@@ -1,3 +1,7 @@
+#seed.py is for adding course or updating course information to the database
+#to update the course information in the database, make a change in Data/courses.json
+#and then, in cmd, run cd backend, run python seed.py
+
 from Database.database import SUPABASE
 import os #for file manipulation and detection
 import json

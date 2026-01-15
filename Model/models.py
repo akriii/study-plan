@@ -7,13 +7,6 @@ class StudentLogin(BaseModel):
     student_email: EmailStr
     student_password: str
 
-class CourseCreate(BaseModel):
-    course_name: str 
-    credit_hour: float
-    student_grade: Optional[str] = "Null"
-    course_code: str 
-    semester: int
-    prerequisite: str 
 class StudentCreate(BaseModel):
     student_name: str 
     student_email: EmailStr
@@ -22,37 +15,29 @@ class StudentCreate(BaseModel):
     student_GOT: Optional[date] = None
     
 class StudentCalcGOT(BaseModel):
-    student_GOT: date
+    student_GOT: Optional[date]
 
 class StudentRead(BaseModel):
-    student_id: UUID
-    student_email: EmailStr
-    student_name: str
+    student_id: Optional[UUID]
+    student_email: Optional[EmailStr]
+    student_name: Optional[str]
     student_image: Optional[str] = None
     student_GOT: Optional[date] = None
     
-class CourseRead(BaseModel):
-    course_name: str 
-    credit_hour: float
-    student_grade: str 
-    course_code: str 
-    student_id: str
-    prerequisite: str 
-
 class Summary(BaseModel):
-    
-    count_course: int
-    student_cgpa: float
+    count_course: Optional[int]
+    count_completed: Optional[int]
+    student_cgpa: Optional[float]
    
 class StudentUpdate(BaseModel):
-    student_id: UUID
     student_image: str
     student_name: str
+    student_GOT: date
 
 class StudentRemove(BaseModel):
     student_id: UUID
     student_name: str 
-    student_email: EmailStr
+    student_email: Optional[EmailStr]
     student_password: str 
     student_image: Optional[str] = None
     student_GOT: Optional[date] = None
@@ -61,19 +46,25 @@ class StudentCourseAdd(BaseModel):
     student_id: UUID
     course_code: str
     semester: int
-    grade: str
+    grade: Optional[str] = "Null"
     status: Optional[str] = "Null"
 
-class CourseType(BaseModel):
-    course_type: str
+class CourseRead(BaseModel):
+    course_name: str 
+    course_code: str 
+    credit_hour: Optional[float] = 0.0 
+    student_grade: Optional[str] = "N/A"
+    student_id: Optional[str] = None
+    prerequisite: Optional[list] = []
+    STUDENT_COURSE: Optional[list[StudentCourseAdd]] = []
 
 class ReadSemesterCourse(BaseModel):
-    semester: int
-    course_code: str
-    student_id: UUID
-    grade: str
-    status: str
-    COURSE: CourseRead
+    semester: Optional[int]
+    course_code: Optional[str]
+    student_id: Optional[UUID]
+    grade: Optional[str]
+    status: Optional[str]
+    COURSE: Optional[CourseRead] 
 
 class UpdateStudentCourse(BaseModel):
     course_code: str

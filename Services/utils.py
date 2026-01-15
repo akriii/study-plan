@@ -10,7 +10,7 @@ def HashPassword(password:str):
 def VerifyPassword(plain_password:str, hashed_password:str):
     return pwd_context.verify(plain_password,hashed_password)
 
-def CountInProgress(course_list:list):
+def CountCourses(course_list:list):
     count = len(course_list)
     return count
 
