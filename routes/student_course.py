@@ -1,7 +1,7 @@
 from fastapi import FastAPI,APIRouter, HTTPException
 from Database.database import SUPABASE
 from Model.models import   Summary, StudentCourseAdd, ReadSemesterCourse, UpdateStudentCourse, SemesterRemove
-from Services.utils import Calc_Cgpa, CountCourses, Calc_Gpa
+from Services.utils import Calc_Cgpa, CountCourses
 from uuid import UUID
 
 router = APIRouter()

@@ -21,5 +21,3 @@ def Calc_Cgpa(courses: list):
 
     return cgpa
 
-def Calc_Gpa(grade: str):
-    
