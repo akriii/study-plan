@@ -29,10 +29,11 @@ class Summary(BaseModel):
     count_completed: Optional[int]
     student_cgpa: Optional[float]
    
+
 class StudentUpdate(BaseModel):
-    student_image: str
-    student_name: str
-    student_GOT: date
+    student_image: Optional[str]
+    student_name: Optional[str]
+    student_GOT: Optional[date]
 
 class StudentRemove(BaseModel):
     student_id: UUID

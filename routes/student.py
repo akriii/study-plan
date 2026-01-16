@@ -1,6 +1,6 @@
 from fastapi import FastAPI,APIRouter, HTTPException
 from Database.database import SUPABASE
-from Model.models import StudentCreate, StudentRead,StudentLogin, StudentUpdate, StudentRemove, StudentCalcGOT
+from Model.models import StudentCreate, StudentRead,StudentLogin, StudentUpdate, StudentCalcGOT
 from Services.utils import HashPassword, VerifyPassword
 from uuid import UUID
 router = APIRouter() #defining a router for student-related routes
@@ -26,6 +26,8 @@ async def register_student(student:StudentCreate):
     }
     response = SUPABASE.table("STUDENT").insert(new_student).execute() 
     return response.data
+
+
 
 #route for calc student graduate on time
 @router.put("/update_got/{student_id}") 
@@ -58,7 +60,7 @@ async def login_student(student:StudentLogin):
         "student_id": user_record["student_id"]
     }
 
-#route for update student information
+#route for update all student information
 @router.put("/update/{student_id}" ,response_model=StudentUpdate)
 async def update_student(student_id:UUID, student_data:StudentUpdate):
     data = student_data.model_dump(exclude_unset=True)
@@ -70,7 +72,7 @@ async def update_student(student_id:UUID, student_data:StudentUpdate):
     return response.data[0]
 
 #route for delete student id
-@router.delete("/delete/{student_id}", response_model=StudentRemove)
+@router.delete("/delete/{student_id}")
 async def delete_student(student_id:UUID):
     
 

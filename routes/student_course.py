@@ -1,7 +1,7 @@
 from fastapi import FastAPI,APIRouter, HTTPException
 from Database.database import SUPABASE
 from Model.models import   Summary, StudentCourseAdd, ReadSemesterCourse, UpdateStudentCourse, SemesterRemove
-from Services.utils import Calc_Cgpa, CountCourses
+from Services.utils import Calc_Cgpa, CountCourses, Calc_Gpa
 from uuid import UUID
 
 router = APIRouter()
@@ -69,6 +69,9 @@ async def add_student_course(course: StudentCourseAdd):
                     detail=f"Requirement Unmet: {pre_code} must be 'Completed' and 'Passed' first."
                 )
             
+    if course.grade:
+        course.status = "Completed" 
+
     new_enrollment = {
         "student_id": str(course.student_id),
         "course_code": course.course_code,

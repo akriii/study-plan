@@ -20,3 +20,6 @@ def Calc_Cgpa(courses: list):
     cgpa = total_grade / total_credits
 
     return cgpa
+
+def Calc_Gpa(grade: str):
+    
