@@ -8,7 +8,7 @@ router = APIRouter()
 #route to get sepcific student_course data
 @router.get("/get/{student_id}/{course_code}", response_model=list[ReadSemesterCourse]) #@router is a sub mdodule of FastAPI to handle routes
 async def read_student_course_specific(student_id:UUID, course_code:str):
-    response = SUPABASE.table("STUDENT_COURSE").select("*, COURSE(course_name, credit_hours, course_type,pre_requisite").eq("student_id",student_id).eq("course_code",course_code).execute() #query to get student_course and course data based on course_code
+    response = SUPABASE.table("STUDENT_COURSE").select("*, COURSE(course_name, credit_hour, course_type,pre_requisite)").eq("student_id",student_id).eq("course_code",course_code).execute() #query to get student_course and course data based on course_code
     if not response.data:
         raise HTTPException(status_code=404, detail="Record not found")
     return response.data
@@ -16,16 +16,16 @@ async def read_student_course_specific(student_id:UUID, course_code:str):
 #route to get all student_course data
 @router.get("/get/{student_id}", response_model=list[ReadSemesterCourse]) 
 async def read_student_course_all(student_id:UUID):
-    response = SUPABASE.table("STUDENT_COURSE").select("*, COURSE(course_name, credit_hours, course_type,pre_requisite").eq("student_id",student_id).execute()
+    response = SUPABASE.table("STUDENT_COURSE").select("*, COURSE(course_code,course_name, credit_hour, course_type,pre_requisite)").eq("student_id",student_id).execute()
     if not response.data:
         raise HTTPException(status_code=404, detail="Record not found")
-    return response.data
+    return response.data[0]
 
 #get list of course taken by each semester
 @router.get("/get/SemesterCourse/{student_id}/{semester}", response_model=list[ReadSemesterCourse])
 async def get_semester_course(student_id: str, semester: int):
     response = SUPABASE.table("STUDENT_COURSE") \
-    .select("*, COURSE(course_name, credit_hours, course_type)")  \
+    .select("*, COURSE(course_name, credit_hour, course_type)")  \
     .eq("student_id", student_id) \
     .eq("semester", semester) \
     .execute()

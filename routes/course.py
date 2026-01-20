@@ -7,7 +7,7 @@ from uuid import UUID
 router = APIRouter()
 #get all course information
 @router.get("/get", response_model=list[CourseRead]) #@router is a sub mdodule of FastAPI to handle routes
-async def read_all_course(course_code:str):
+async def read_all_course():
     response = SUPABASE.table("COURSE").select("*").execute()
     if not response.data:
         raise HTTPException(status_code=404, detail="Course not found")

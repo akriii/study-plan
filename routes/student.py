@@ -3,6 +3,9 @@ from Database.database import SUPABASE
 from Model.models import StudentCreate, StudentRead,StudentLogin, StudentUpdate, StudentCalcGOT
 from Services.utils import HashPassword, VerifyPassword
 from uuid import UUID
+from fastapi.encoders import jsonable_encoder
+from datetime import date, datetime
+
 router = APIRouter() #defining a router for student-related routes
 
 #route to fetch student based on student id sent by react
@@ -15,8 +18,8 @@ async def read_students(student_id:UUID):
     return response.data
 
 # Route to add a new student
-@router.post("/register", response_model=StudentRead)  
-async def register_student(student:StudentCreate):
+@router.post("/register")  
+async def register_student(student: StudentCreate):
     raw_password = student.student_password
     hashed = HashPassword(raw_password)
     new_student = {
@@ -24,19 +27,27 @@ async def register_student(student:StudentCreate):
         "student_email": student.student_email,
         "student_password": hashed,
     }
+    
     response = SUPABASE.table("STUDENT").insert(new_student).execute() 
-    return response.data
+    
+    # FIX: Return the first item of the list
+    if response.data:
+        return response.data[0]
+    
+    raise HTTPException(status_code=400, detail="Registration failed")
 
 
-
-#route for calc student graduate on time
 @router.put("/update_got/{student_id}") 
 async def update_got(student_id: UUID, data: StudentCalcGOT):
+    
+    clean_payload = data.model_dump(mode='json')
+    
     response = SUPABASE.table("STUDENT") \
-        .update({"student_GOT": data.student_GOT}) \
+        .update(clean_payload) \
         .eq("student_id", student_id) \
         .execute()
-    return response.data
+
+    return jsonable_encoder(response.data)
 
 # Route for student login
 @router.post("/login")  
