@@ -13,6 +13,36 @@ async def read_all_course():
         raise HTTPException(status_code=404, detail="Course not found")
     return response.data
 
+async def get_courses(course_type: str):
+    response = SUPABASE.table("COURSE").select("*").ilike("course_type", course_type.strip()).execute()
+    if not response.data:
+        raise HTTPException(status_code=404, detail="Courses not found")
+    return response.data
+#get core discipline course information
+@router.get("/get/CoreDiscipline")
+async def read_all_core_discipline_courses():
+    return await get_courses("CD")
+
+#get core specialization course information only
+@router.get("/get/CoreSpecialization")
+async def read_all_core_specialization_courses():
+    return await get_courses("CSp")
+
+#get university requirement course information only
+@router.get("/get/UniversityRequirement")
+async def read_all_university_requirement_courses():
+    return await get_courses("UR")
+
+#get national requirement course information only
+@router.get("/get/NationalRequirement")
+async def read_all_national_requirement_courses():
+    return await get_courses("NR")
+
+#get common course information only
+@router.get("/get/CommonCourse")
+async def read_all_common_course_courses():
+    return await get_courses("CC")
+
 #get specific course information
 @router.get("/get/{course_code}", response_model=list[CourseRead]) #@router is a sub mdodule of FastAPI to handle routes
 async def get_specific_course(course_code:str):
@@ -21,35 +51,7 @@ async def get_specific_course(course_code:str):
         raise HTTPException(status_code=404, detail="Course not found")
     return response.data
 
-async def get_courses(course_type: str):
-    response = SUPABASE.table("COURSE").select("*").eq("course_type",course_type).execute()
-    if not response.data:
-        raise HTTPException(status_code=404, detail="Courses not found")
-    return response.data
-#get core discipline course information
-@router.get("/get/CoreDiscipline", response_model=list[CourseRead])
-async def read_all_core_discipline_courses():
-    return await get_courses("CD")
 
-#get core specialization course information only
-@router.get("/get/CoreSpecialization", response_model=list[CourseRead])
-async def read_all_core_specialization_courses():
-    return await get_courses("CSp")
-
-#get university requirement course information only
-@router.get("/get/UniversityRequirement", response_model=list[CourseRead])
-async def read_all_university_requirement_courses():
-    return await get_courses("UR")
-
-#get national requirement course information only
-@router.get("/get/NationalRequirement", response_model=list[CourseRead])
-async def read_all_national_requirement_courses():
-    return await get_courses("NR")
-
-#get common course information only
-@router.get("/get/CommonCourse", response_model=list[CourseRead])
-async def read_all_common_course_courses():
-    return await get_courses("CC")
 
 async def get_available_courses_by_type(student_id: UUID, course_type: str):  #accept the student id and course type sent by the router
 

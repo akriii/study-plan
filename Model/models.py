@@ -30,6 +30,9 @@ class Summary(BaseModel):
     count_completed: Optional[int]
     student_cgpa: Optional[float]
    
+class Gpa(BaseModel):
+    semester: int
+    gpa: Optional[float]
 
 class StudentUpdate(BaseModel):
     student_image: Optional[str]
@@ -53,20 +56,17 @@ class StudentCourseAdd(BaseModel):
 
 class CourseRead(BaseModel):
     course_name: Optional[str] 
-    course_code: str 
+    course_code: Optional[str] 
     credit_hour: Optional[float] = 0.0 
-    student_grade: Optional[str] = "N/A"
-    student_id: Optional[str] = None
     prerequisite: Optional[list] = []
-    STUDENT_COURSE: Optional[list[StudentCourseAdd]] = []
-
+    
 class ReadSemesterCourse(BaseModel):
     semester: Optional[int]
     course_code: Optional[str]
     student_id: Optional[UUID]
     grade: Optional[str]
     status: Optional[str]
-    COURSE: Optional[CourseRead] 
+    COURSE: Optional[list[CourseRead]] = []
 
 class UpdateStudentCourse(BaseModel):
     course_code: str
