@@ -5,7 +5,7 @@ from Services.utils import Calc_Cgpa, Calc_Gpa
 from uuid import UUID
 
 router = APIRouter()
-#route to get sepcific student_course data
+#route to get sepcific course student_course data
 @router.get("/get/{student_id}/{course_code}", response_model=list[ReadSemesterCourse]) #@router is a sub mdodule of FastAPI to handle routes
 async def read_student_course_specific(student_id:UUID, course_code:str):
     response = SUPABASE.table("STUDENT_COURSE").select("*, COURSE(course_code,course_name, credit_hour, course_type,pre_requisite)").eq("student_id",student_id).eq("course_code",course_code).execute() #query to get student_course and course data based on course_code
@@ -13,7 +13,7 @@ async def read_student_course_specific(student_id:UUID, course_code:str):
         raise HTTPException(status_code=404, detail="Record not found")
     return response.data
 
-#route to get all student_course data
+#route to get all course student_course data
 @router.get("/get/{student_id}", response_model=list[ReadSemesterCourse]) 
 async def read_student_course_all(student_id:UUID):
     response = SUPABASE.table("STUDENT_COURSE").select("*, COURSE(course_code,course_name, credit_hour, course_type, pre_requisite)").eq("student_id",student_id).execute()
@@ -69,7 +69,7 @@ async def add_student_course(course: StudentCourseAdd):
                     detail=f"Requirement Unmet: {pre_code} must be 'Completed' and 'Passed' first."
                 )
             
-    if course.grade:
+    if  course.grade:
         course.status = "Completed" 
 
     new_enrollment = {
@@ -87,21 +87,25 @@ async def add_student_course(course: StudentCourseAdd):
         raise HTTPException(status_code=400, detail="Failed to add course. It might already exist in your records.")
 
 async def get_courses(student_id: UUID, status: str):
-    response = SUPABASE.table("STUDENT_COURSE").select("*").eq("student_id",student_id).eq("status",status).execute()
+    response = SUPABASE.table("STUDENT_COURSE").select("*, COURSE(course_code,course_name, credit_hour, course_type, pre_requisite)").eq("student_id",student_id).eq("status",status).execute()
 
     if not response.data:
         return []
     return response.data
 
 #route to get completed course
-@router.get("/Completed/{student_id}", response_model=list[ReadSemesterCourse]) #use list because it returns multiple items of student course
-async def completed_course(student_id:UUID):
+@router.get("/CompletedCourse/{student_id}", response_model=list[ReadSemesterCourse]) #use list because it returns multiple items of student course
+async def list_completed_course(student_id:UUID):
     return await get_courses(student_id, "Completed")
 
 #route to get in progress course
-@router.get("/InProgress/{student_id}", response_model=list[ReadSemesterCourse])
-async def in_progress_course(student_id:UUID):
-    return await get_courses(student_id, "In Progress")
+@router.get("/CurrentCourse/{student_id}", response_model=list[ReadSemesterCourse])
+async def list_current_course(student_id:UUID):
+    return await get_courses(student_id, "Current")
+
+@router.get("/PlannedCourse/{student_id}", response_model=list[ReadSemesterCourse])
+async def list_planned_course(student_id:UUID):
+    return await get_courses(student_id, "Planned")
 
 #calculation
 @router.get("/Summary/{student_id}", response_model=Summary)
@@ -114,17 +118,19 @@ async def get_student_summary(student_id: UUID):
 
     all_data = response.data
     if not all_data:
-        return {"count_course": 0, "count_completed": 0, "student_cgpa": 0.0}
+        return {"count_completed_course": 0, "count_current_course": 0, "count_planned_course": 0, "student_cgpa": 0.0}
 
-    completed_list = [c for c in all_data if c["status"] == "Completed"]
-    in_progress_count = len([c for c in all_data if c["status"] == "In Progress"])
+    completed_count = [c for c in all_data if c["status"] == "Completed"]
+    current_count = [c for c in all_data if c["status"] == "Current"]
+    planned_count = [c for c in all_data if c["status"] == "Planned"]
     
-    cgpa = Calc_Cgpa(completed_list)
+    cgpa = Calc_Cgpa(completed_count)
     
     return {
-        "count_course": in_progress_count,
-        "count_completed": len(completed_list),
-        "student_cgpa": cgpa
+        "count_completed_course": len(completed_count),
+        "count_current_course": len(current_count),
+        "count_planned_course": len(planned_count),
+        "student_cgpa": cgpa,
     }
 
 @router.get("/GPA/{student_id}/{semester_id}")

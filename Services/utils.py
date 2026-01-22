@@ -46,8 +46,8 @@ def Calc_Gpa(courses: list):
     points, credits = calculate_points_and_credits(courses)
     return round(points / credits, 2) if credits > 0 else 0.00
 
-def Calc_Cgpa(all_completed_courses: list):
+def Calc_Cgpa(completed_count: list):
     """Calculates CGPA across all semesters."""
-    points, credits = calculate_points_and_credits(all_completed_courses)
+    points, credits = calculate_points_and_credits(completed_count)
     return round(points / credits, 2) if credits > 0 else 0.00
 

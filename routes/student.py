@@ -1,7 +1,6 @@
 from fastapi import FastAPI,APIRouter, HTTPException, UploadFile, File
 from Database.database import SUPABASE
 from Model.models import StudentCreate, StudentRead,StudentLogin, StudentUpdate, StudentCalcGOT
-from Services.utils import VerifyPassword
 from uuid import UUID
 from fastapi.encoders import jsonable_encoder
 from datetime import date, datetime
@@ -29,6 +28,10 @@ async def register_student(student: StudentCreate):
         auth_response = SUPABASE.auth.sign_up({
             "email": student.student_email,
             "password": student.student_password,
+            #"options": {
+            #link must be url to verified page that has been designed by react
+                #"email_redirect_to": "http://localhost:3000/verified"
+            #},
         })
 
         if not auth_response.user:
@@ -58,8 +61,8 @@ async def register_student(student: StudentCreate):
         raise HTTPException(status_code=400, detail=error_msg)
 
 #update image to student table
-@router.put("/student/update-profile-image/{student_id}")
-async def update_student_image(student_id: UUID, file: UploadFile = File(...)):
+@router.put("/upload-profile-image/{student_id}")
+async def upload_student_image(student_id: UUID, file: UploadFile = File(...)):
     try:
         # 1. Read the image file content
         file_content = await file.read()

@@ -6,12 +6,25 @@ from uuid import UUID
 
 router = APIRouter()
 #get all course information
-@router.get("/get", response_model=list[CourseRead]) #@router is a sub mdodule of FastAPI to handle routes
+@router.get("/get", response_model=list[CourseRead])
 async def read_all_course():
     response = SUPABASE.table("COURSE").select("*").execute()
+    
     if not response.data:
         raise HTTPException(status_code=404, detail="Course not found")
-    return response.data
+
+    cleaned_data = []
+    for course in response.data:
+        pre_req = course.get("pre_requisite")
+
+        if isinstance(pre_req, str):
+            course["pre_requisite"] = [pre_req]
+        elif pre_req is None:
+            course["pre_requisite"] = []
+        
+        cleaned_data.append(course)
+
+    return cleaned_data
 
 async def get_courses(course_type: str):
     response = SUPABASE.table("COURSE").select("*").ilike("course_type", course_type.strip()).execute()
@@ -53,18 +66,27 @@ async def get_specific_course(course_code:str):
 
 
 
-async def get_available_courses_by_type(student_id: UUID, course_type: str):  #accept the student id and course type sent by the router
-
+async def get_available_courses_by_type(student_id: UUID, course_type: str):
+    # 1. Get student history including Completed and In Progress
     history_res = SUPABASE.table("STUDENT_COURSE") \
         .select("course_code, grade, status") \
         .eq("student_id", student_id) \
         .execute()
     
-    passed_courses = {  #create a set of passed course and check whether the student course taken is passed or not
+    # Track courses already passed (Completed and not F)
+    passed_courses = { 
         record["course_code"] for record in history_res.data 
         if record["grade"] not in ["F", "Fail"] and record["status"] == "Completed"
     }
 
+    # Track courses currently being taken (In Progress)
+    # This prevents offering a course the student is already enrolled in
+    enrolled_courses = {
+        record["course_code"] for record in history_res.data 
+        if record["status"] == "In Progress"
+    }
+
+    # 2. Get all courses for this category
     all_courses_res = SUPABASE.table("COURSE") \
         .select("*") \
         .eq("course_type", course_type) \
@@ -75,24 +97,34 @@ async def get_available_courses_by_type(student_id: UUID, course_type: str):  #a
 
     available_courses = []
 
-    for course in all_courses_res.data: #loop for every courses based on course type
-        code = course["course_code"]  #initialize course code in course table based on course type into code
+    for course in all_courses_res.data:
+        code = course["course_code"]
         
-        if code in passed_courses: #check student has passed the courses or not
+        # SKIP if student already passed it OR is currently taking it
+        if code in passed_courses or code in enrolled_courses:
             continue
             
+        # 3. Handle Prerequisite Data Cleaning
+        # Ensure it is a clean list so it shows up in your API response
         pre_reqs = course.get("pre_requisite")
         
-        if isinstance(pre_reqs, str): #if pre reqs is in str, change to list
-            pre_reqs = [pre_reqs]
-        elif pre_reqs is None:
-            pre_reqs = []
+        if isinstance(pre_reqs, str):
+            # Handle cases where DB might store it as a single string
+            cleaned_pre_reqs = [pre_reqs] if pre_reqs.strip() else []
+        elif isinstance(pre_reqs, list):
+            cleaned_pre_reqs = pre_reqs
+        else:
+            cleaned_pre_reqs = []
 
-        if not pre_reqs or all(pre in passed_courses for pre in pre_reqs):  #check if pre reqs not exist or pre reqs is passed
-            available_courses.append(course) # Returning the full course object based on course
+        # Update the object with the cleaned list so it displays in the response
+        course["pre_requisite"] = cleaned_pre_reqs
+
+        # 4. Final Availability Check
+        # Available only if all prerequisites are in 'passed_courses'
+        if not cleaned_pre_reqs or all(pre in passed_courses for pre in cleaned_pre_reqs):
+            available_courses.append(course)
 
     return available_courses
-
 @router.get("/get/CourseAvailable/CoreDiscipline/{student_id}", response_model=list[CourseRead])
 async def read_available_cd(student_id: UUID):
     return await get_available_courses_by_type(student_id, "CD")
