@@ -1,8 +1,8 @@
 from pydantic import BaseModel, EmailStr, Field
 from datetime import date
-from typing import Optional, Any
+from typing import Optional, Any, Union
 from uuid import UUID
-import json
+
 
 class StudentLogin(BaseModel):
     student_email: EmailStr
@@ -16,7 +16,6 @@ class StudentCreate(BaseModel):
     student_GOT: Optional[Any] = None
     
 class StudentCalcGOT(BaseModel):
-    student_GOT: Optional[Any]
     intake_session: Optional[Any]
 
 class StudentRead(BaseModel):
@@ -39,10 +38,9 @@ class Gpa(BaseModel):
     gpa: Optional[float]
 
 class StudentUpdate(BaseModel):
-    student_image: Optional[str]
-    student_name: Optional[str]
-    student_GOT: Optional[Any]
-    intake_session: Optional[Any]
+    student_image: Optional[str] = None
+    student_name: Optional[str] = None
+    intake_session: Optional[Union[date, str]] = None
 
 class StudentRemove(BaseModel):
     student_id: UUID

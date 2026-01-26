@@ -7,7 +7,7 @@ from datetime import date, datetime
 from dotenv import load_dotenv
 import os
 
-load_dotenv
+load_dotenv()
 
 BUCKET = os.getenv("SUPABASE_BUCKET")
 
@@ -105,7 +105,7 @@ async def upload_student_image(student_id: UUID, file: UploadFile = File(...)):
     except Exception as e:
         raise HTTPException(status_code=500, detail=f"Image upload failed: {str(e)}")
 
-
+"""
 @router.put("/update_intake/{student_id}") 
 async def update_got(student_id: UUID, data: StudentCalcGOT):
     
@@ -117,6 +117,7 @@ async def update_got(student_id: UUID, data: StudentCalcGOT):
         .execute()
 
     return jsonable_encoder(response.data)
+"""
 
 # Route for student login
 @router.post("/login")

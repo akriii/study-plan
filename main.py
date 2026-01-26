@@ -1,6 +1,6 @@
 from fastapi import FastAPI, HTTPException
 from Database.database import SUPABASE
-from Routes import student,course, student_course
+from Routes import student,course, student_course, advisor
 from fastapi.middleware.cors import CORSMiddleware
 
 app = FastAPI()
@@ -27,6 +27,7 @@ app.add_middleware(
 app.include_router(student.router, prefix="/student", tags=["student"]) #take every router from student.py and include it in main app
 app.include_router(course.router, prefix="/course", tags=["course"]) #if i have routes like @router.get("/course") in course.py then it will be accessible at /course/course
 app.include_router(student_course.router, prefix="/student_course", tags=["student_course"])
+app.include_router(advisor.router, prefix="/advisor", tags=["advisor"])
 
 @app.get("/check") #@app is the main FastAPI instance which connects all routes (@router) together
 def check_connection():
