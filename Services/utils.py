@@ -1,8 +1,6 @@
 from passlib.context import CryptContext
 from Database.database import SUPABASE
 
-
-
 pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
 def HashPassword(password:str):
     safe_password = password[:72] #72 bytes of password hashed only
@@ -23,16 +21,15 @@ def calculate_points_and_credits(courses: list):
     total_grade_points = 0
 
     for item in courses:
-        # Get credits from nested COURSE join
-        course_info = item.get("COURSE", {})
-        credits = course_info.get("credit_hour", 0)
         
-        # Get letter grade
+        course_info = item.get("COURSE", {}) # Get credit hour from nested COURSE join
+        credits = course_info.get("credit_hour", 0) #based on nested COURSE join, we get credit hour
+        
         raw_grade = item.get("grade")
 
         # Convert to points
         if isinstance(raw_grade, str):
-            quality_points = GRADE_MAP.get(raw_grade.upper().strip(), 0.00)
+            quality_points = GRADE_MAP.get(raw_grade.upper().strip(), 0.00) #map the grade taken based on GRADE_MAP
         else:
             quality_points = raw_grade if raw_grade is not None else 0.00
 

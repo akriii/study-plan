@@ -40,26 +40,26 @@ async def add_student_course(course: StudentCourseAdd):
     
     if not course_query.data:
         raise HTTPException(status_code=404, detail="Course code not found in system")
-    pre_reqs = course_query.data.get("pre_requisite")
-
-    if isinstance(pre_reqs, str):
-        pre_reqs = [pre_reqs]
-    elif pre_reqs is None:
+    
+    raw_pre_reqs = course_query.data.get("pre_requisite")
+    
+    if isinstance(raw_pre_reqs, str):
+        pre_reqs = [raw_pre_reqs] if raw_pre_reqs.strip() else []
+    elif isinstance(raw_pre_reqs, list):
+        pre_reqs = raw_pre_reqs
+    else:
         pre_reqs = []
 
-    if pre_reqs:
+    if course.status in ["Current", "Completed"] and pre_reqs:
         for pre_code in pre_reqs:
-            if not pre_code: continue 
-
             history = SUPABASE.table("STUDENT_COURSE").select("grade, status") \
                 .eq("student_id", course.student_id) \
                 .eq("course_code", pre_code).execute()
             
             if not history.data:
-                raise HTTPException(status_code=400, detail=f"Cannot enroll. Prerequisite {pre_code} has not been taken.")
+                raise HTTPException(status_code=400, detail=f"Requirement Unmet: Prerequisite {pre_code} must be taken first.")
             
             record = history.data[0]
-            
             is_failed = record["grade"] in ["F", "f", "Fail", "FAIL"]
             is_not_finished = record["status"] != "Completed"
 
@@ -68,10 +68,10 @@ async def add_student_course(course: StudentCourseAdd):
                     status_code=400, 
                     detail=f"Requirement Unmet: {pre_code} must be 'Completed' and 'Passed' first."
                 )
-            
-    if  course.grade:
-        course.status = "Completed" 
 
+    if course.grade:
+        course.status = "Completed"
+    
     new_enrollment = {
         "student_id": str(course.student_id),
         "course_code": course.course_code,
@@ -85,7 +85,8 @@ async def add_student_course(course: StudentCourseAdd):
         return response.data[0]
     except Exception as e:
         raise HTTPException(status_code=400, detail="Failed to add course. It might already exist in your records.")
-
+    
+    
 async def get_courses(student_id: UUID, status: str):
     response = SUPABASE.table("STUDENT_COURSE").select("*, COURSE(course_code,course_name, credit_hour, course_type, pre_requisite)").eq("student_id",student_id).eq("status",status).execute()
 

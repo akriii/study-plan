@@ -64,29 +64,24 @@ async def get_specific_course(course_code:str):
         raise HTTPException(status_code=404, detail="Course not found")
     return response.data
 
-
-
 async def get_available_courses_by_type(student_id: UUID, course_type: str):
-    # 1. Get student history including Completed and In Progress
     history_res = SUPABASE.table("STUDENT_COURSE") \
         .select("course_code, grade, status") \
         .eq("student_id", student_id) \
         .execute()
     
-    # Track courses already passed (Completed and not F)
     passed_courses = { 
         record["course_code"] for record in history_res.data 
-        if record["grade"] not in ["F", "Fail"] and record["status"] == "Completed"
+        if record["status"] == "Completed" and record["grade"] not in ["F", "Fail", None]
     }
 
-    # Track courses currently being taken (In Progress)
-    # This prevents offering a course the student is already enrolled in
-    enrolled_courses = {
+    # If a course is Current, Completed, or Planned, they shouldn't "add" it again
+    unavailable_statuses = ["Current", "Completed", "Planned"]
+    taken_or_planned = {
         record["course_code"] for record in history_res.data 
-        if record["status"] == "In Progress"
+        if record["status"] in unavailable_statuses
     }
 
-    # 2. Get all courses for this category
     all_courses_res = SUPABASE.table("COURSE") \
         .select("*") \
         .eq("course_type", course_type) \
@@ -100,31 +95,29 @@ async def get_available_courses_by_type(student_id: UUID, course_type: str):
     for course in all_courses_res.data:
         code = course["course_code"]
         
-        # SKIP if student already passed it OR is currently taking it
-        if code in passed_courses or code in enrolled_courses:
+        if code in taken_or_planned:
             continue
             
-        # 3. Handle Prerequisite Data Cleaning
-        # Ensure it is a clean list so it shows up in your API response
         pre_reqs = course.get("pre_requisite")
         
         if isinstance(pre_reqs, str):
-            # Handle cases where DB might store it as a single string
             cleaned_pre_reqs = [pre_reqs] if pre_reqs.strip() else []
         elif isinstance(pre_reqs, list):
             cleaned_pre_reqs = pre_reqs
         else:
             cleaned_pre_reqs = []
 
-        # Update the object with the cleaned list so it displays in the response
+        # Force the field to be a list so the Pydantic model doesn't crash
         course["pre_requisite"] = cleaned_pre_reqs
 
-        # 4. Final Availability Check
-        # Available only if all prerequisites are in 'passed_courses'
+        # A course is available only if:
+        # - It has no prerequisites OR
+        # - All its prerequisites are in the 'passed_courses' set
         if not cleaned_pre_reqs or all(pre in passed_courses for pre in cleaned_pre_reqs):
             available_courses.append(course)
 
     return available_courses
+    
 @router.get("/get/CourseAvailable/CoreDiscipline/{student_id}", response_model=list[CourseRead])
 async def read_available_cd(student_id: UUID):
     return await get_available_courses_by_type(student_id, "CD")

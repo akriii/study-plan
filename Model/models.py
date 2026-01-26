@@ -17,6 +17,7 @@ class StudentCreate(BaseModel):
     
 class StudentCalcGOT(BaseModel):
     student_GOT: Optional[Any]
+    intake_session: Optional[Any]
 
 class StudentRead(BaseModel):
     student_id: Optional[UUID]
@@ -24,6 +25,7 @@ class StudentRead(BaseModel):
     student_name: Optional[str]
     student_image: Optional[str] = None
     student_GOT: Optional[date] = None
+    intake_session: Optional[date] = None
     
 class Summary(BaseModel):
     count_completed_course: Optional[int]
@@ -39,7 +41,8 @@ class Gpa(BaseModel):
 class StudentUpdate(BaseModel):
     student_image: Optional[str]
     student_name: Optional[str]
-    student_GOT: Optional[date]
+    student_GOT: Optional[Any]
+    intake_session: Optional[Any]
 
 class StudentRemove(BaseModel):
     student_id: UUID
