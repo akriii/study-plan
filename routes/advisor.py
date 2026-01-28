@@ -53,7 +53,7 @@ async def get_hf_advisor(student_id: UUID):
                 {"role": "user", "content": f"Student Transcript Data:\n{transcript_summary}"}
             ],
             max_tokens=600,
-            temperature=0.6 # Lower temperature makes it more professional/less creative
+            temperature=0.6 # Lower temperature makes it more professional and less creative
         )
         
         return {"analysis": response.choices[0].message.content}
@@ -61,3 +61,4 @@ async def get_hf_advisor(student_id: UUID):
     except Exception as e:
         print(f"HF ROUTER ERROR: {str(e)}")
         raise HTTPException(status_code=500, detail="Advisor is currently offline.")
+    

@@ -48,3 +48,27 @@ def Calc_Cgpa(completed_count: list):
     points, credits = calculate_points_and_credits(completed_count)
     return round(points / credits, 2) if credits > 0 else 0.00
 
+def Get_Probation_Status(student_id: str, target_semester: int):
+    """
+    Checks the GPA of the semester immediately preceding target_semester.
+    Returns (is_probation, credit_limit)
+    """
+    if target_semester <= 1:
+        return False, 15  
+
+    prev_sem = target_semester - 1
+    response = SUPABASE.table("STUDENT_COURSE") \
+        .select("*, COURSE(credit_hour)") \
+        .eq("student_id", student_id) \
+        .eq("semester", prev_sem) \
+        .eq("status", "Completed") \
+        .execute()
+
+    if not response.data:
+        return False, 15 # No history found, assume normal
+
+    gpa = Calc_Gpa(response.data)
+    
+    if gpa < 2.00:
+        return True, 11  # Probation Limit
+    return False, 15   # Normal Limit

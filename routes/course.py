@@ -70,16 +70,16 @@ async def get_available_courses_by_type(student_id: UUID, course_type: str):
         .eq("student_id", student_id) \
         .execute()
     
-    passed_courses = { 
+    # 1. These are the courses that "unlock" future ones
+    planning_eligibility = {
         record["course_code"] for record in history_res.data 
-        if record["status"] == "Completed" and record["grade"] not in ["F", "Fail", None]
+        if record["status"] in ["Completed", "Current", "Planned"]
     }
 
-    # If a course is Current, Completed, or Planned, they shouldn't "add" it again
-    unavailable_statuses = ["Current", "Completed", "Planned"]
+    # 2. These are courses already in the student's list (don't show these at all)
     taken_or_planned = {
         record["course_code"] for record in history_res.data 
-        if record["status"] in unavailable_statuses
+        if record["status"] in ["Current", "Completed", "Planned"]
     }
 
     all_courses_res = SUPABASE.table("COURSE") \
@@ -90,33 +90,37 @@ async def get_available_courses_by_type(student_id: UUID, course_type: str):
     if not all_courses_res.data:
         return []
 
-    available_courses = []
+    processed_courses = []
 
     for course in all_courses_res.data:
         code = course["course_code"]
         
+        # We still skip courses the student is ALREADY taking/planned
         if code in taken_or_planned:
             continue
             
         pre_reqs = course.get("pre_requisite")
         
+        # Normalize pre_reqs to a list
         if isinstance(pre_reqs, str):
-            cleaned_pre_reqs = [pre_reqs] if pre_reqs.strip() else []
+            cleaned_pre_reqs = [pre_reqs.strip()] if pre_reqs.strip() else []
         elif isinstance(pre_reqs, list):
-            cleaned_pre_reqs = pre_reqs
+            cleaned_pre_reqs = [p.strip() for p in pre_reqs if p.strip()]
         else:
             cleaned_pre_reqs = []
 
-        # Force the field to be a list so the Pydantic model doesn't crash
         course["pre_requisite"] = cleaned_pre_reqs
 
-        # A course is available only if:
-        # - It has no prerequisites OR
-        # - All its prerequisites are in the 'passed_courses' set
-        if not cleaned_pre_reqs or all(pre in passed_courses for pre in cleaned_pre_reqs):
-            available_courses.append(course)
+        # 3. THE KEY CHANGE: Add a status flag instead of filtering
+        # Check if all prerequisites are in the planning_eligibility set
+        is_eligible = not cleaned_pre_reqs or all(pre in planning_eligibility for pre in cleaned_pre_reqs)
+        
+        course["is_unlocked"] = is_eligible
+        
+        # We now append EVERYTHING that isn't already taken
+        processed_courses.append(course)
 
-    return available_courses
+    return processed_courses
     
 @router.get("/get/CourseAvailable/CoreDiscipline/{student_id}", response_model=list[CourseRead])
 async def read_available_cd(student_id: UUID):

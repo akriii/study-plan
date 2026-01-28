@@ -1,6 +1,6 @@
 from pydantic import BaseModel, EmailStr, Field
 from datetime import date
-from typing import Optional, Any, Union
+from typing import Optional, Any, Union, Dict
 from uuid import UUID
 
 
@@ -31,8 +31,13 @@ class Summary(BaseModel):
     count_current_course: Optional[int]
     count_planned_course: Optional[int]
     student_cgpa: Optional[float]
-    
-   
+    semester_credits: Dict[int, int] 
+
+class SemesterSummary(BaseModel):
+    total_credits: int
+    status_counts: Dict[str, int]
+
+
 class Gpa(BaseModel):
     semester: int
     gpa: Optional[float]

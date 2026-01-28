@@ -1,7 +1,7 @@
 from fastapi import FastAPI,APIRouter, HTTPException
 from Database.database import SUPABASE
 from Model.models import   Summary, StudentCourseAdd, ReadSemesterCourse, UpdateStudentCourse, SemesterRemove, Gpa
-from Services.utils import Calc_Cgpa, Calc_Gpa
+from Services.utils import Calc_Cgpa, Get_Probation_Status, calculate_points_and_credits
 from uuid import UUID
 
 router = APIRouter()
@@ -36,40 +36,55 @@ async def get_semester_course(student_id: str, semester: int):
 #add new student_course based on pre-requisite
 @router.post("/add")
 async def add_student_course(course: StudentCourseAdd):
-    course_query = SUPABASE.table("COURSE").select("pre_requisite").eq("course_code", course.course_code).single().execute()
-    
+    course_query = SUPABASE.table("COURSE").select("*").eq("course_code", course.course_code).single().execute()
     if not course_query.data:
-        raise HTTPException(status_code=404, detail="Course code not found in system")
+        raise HTTPException(status_code=404, detail="Course code not found")
     
+    new_course_credits = course_query.data.get("credit_hour", 0)
     raw_pre_reqs = course_query.data.get("pre_requisite")
     
     if isinstance(raw_pre_reqs, str):
-        pre_reqs = [raw_pre_reqs] if raw_pre_reqs.strip() else []
+        pre_reqs = [raw_pre_reqs.strip()] if raw_pre_reqs.strip() else []
     elif isinstance(raw_pre_reqs, list):
-        pre_reqs = raw_pre_reqs
+        pre_reqs = [p.strip() for p in raw_pre_reqs if p.strip()]
     else:
         pre_reqs = []
 
-    if course.status in ["Current", "Completed"] and pre_reqs:
+    is_probation, max_limit = Get_Probation_Status(str(course.student_id), course.semester)
+    
+    current_sem_res = SUPABASE.table("STUDENT_COURSE") \
+        .select("*, COURSE(credit_hour)") \
+        .eq("student_id", course.student_id) \
+        .eq("semester", course.semester).execute()
+    
+    _, current_credits = calculate_points_and_credits(current_sem_res.data)
+    
+    if (current_credits + new_course_credits) > max_limit:
+        status_msg = "Probation" if is_probation else "Normal"
+        raise HTTPException(
+            status_code=400, 
+            detail=f"Credit Limit Exceeded! Current {status_msg} limit is {max_limit} hours."
+        )
+
+    warning_note = None
+    if pre_reqs:
         for pre_code in pre_reqs:
             history = SUPABASE.table("STUDENT_COURSE").select("grade, status") \
                 .eq("student_id", course.student_id) \
                 .eq("course_code", pre_code).execute()
             
-            if not history.data:
-                raise HTTPException(status_code=400, detail=f"Requirement Unmet: Prerequisite {pre_code} must be taken first.")
+            # Check if passed
+            has_passed = False
+            if history.data:
+                record = history.data[0]
+                if record["status"] == "Completed" and record["grade"] not in ["F", "Fail", None]:
+                    has_passed = True
             
-            record = history.data[0]
-            is_failed = record["grade"] in ["F", "f", "Fail", "FAIL"]
-            is_not_finished = record["status"] != "Completed"
+            if not has_passed:
+                
+                warning_note = f"Prerequisite {pre_code} not met. Chair Department approval required."
 
-            if is_failed or is_not_finished:
-                raise HTTPException(
-                    status_code=400, 
-                    detail=f"Requirement Unmet: {pre_code} must be 'Completed' and 'Passed' first."
-                )
-
-    if course.grade:
+    if course.grade and course.grade.strip():
         course.status = "Completed"
     
     new_enrollment = {
@@ -82,11 +97,15 @@ async def add_student_course(course: StudentCourseAdd):
     
     try:
         response = SUPABASE.table("STUDENT_COURSE").insert(new_enrollment).execute()
-        return response.data[0]
-    except Exception as e:
-        raise HTTPException(status_code=400, detail="Failed to add course. It might already exist in your records.")
-    
-    
+        result = response.data[0]
+        
+        if warning_note:
+            result["notification"] = warning_note
+            
+        return result
+    except Exception:
+        raise HTTPException(status_code=400, detail="Course already exists in your records.")
+
 async def get_courses(student_id: UUID, status: str):
     response = SUPABASE.table("STUDENT_COURSE").select("*, COURSE(course_code,course_name, credit_hour, course_type, pre_requisite)").eq("student_id",student_id).eq("status",status).execute()
 
@@ -111,27 +130,49 @@ async def list_planned_course(student_id:UUID):
 #calculation
 @router.get("/Summary/{student_id}", response_model=Summary)
 async def get_student_summary(student_id: UUID):
-    # Fetch all records for the student
+    # Fetch records including the semester column
     response = SUPABASE.table("STUDENT_COURSE")\
-        .select("grade, status, COURSE(credit_hour)")\
+        .select("semester, grade, status, COURSE(credit_hour)")\
         .eq("student_id", student_id)\
         .execute()
 
     all_data = response.data
     if not all_data:
-        return {"count_completed_course": 0, "count_current_course": 0, "count_planned_course": 0, "student_cgpa": 0.0}
+        return {
+            "count_completed_course": 0, 
+            "count_current_course": 0, 
+            "count_planned_course": 0, 
+            "student_cgpa": 0.0,
+            "semester_credits": {}
+        }
 
-    completed_count = [c for c in all_data if c["status"] == "Completed"]
-    current_count = [c for c in all_data if c["status"] == "Current"]
-    planned_count = [c for c in all_data if c["status"] == "Planned"]
+    # Standard Status Filtering
+    completed_list = [c for c in all_data if c["status"] == "Completed"]
+    current_list = [c for c in all_data if c["status"] == "Current"]
+    planned_list = [c for c in all_data if c["status"] == "Planned"]
     
-    cgpa = Calc_Cgpa(completed_count)
+    # Semester Credit Hour Calculation
+    sem_credits = {}
+    for record in all_data:
+        sem = record.get("semester")
+        # Get credit hour from joined COURSE table
+        course_info = record.get("COURSE") or {}
+        credits = course_info.get("credit_hour", 0)
+        
+        if sem in sem_credits:
+            sem_credits[sem] += credits
+        else:
+            sem_credits[sem] = credits
+
+    # CGPA Calculation using your existing utils function
+    cgpa = Calc_Cgpa(completed_list)
     
     return {
-        "count_completed_course": len(completed_count),
-        "count_current_course": len(current_count),
-        "count_planned_course": len(planned_count),
+        "count_completed_course": len(completed_list),
+        "count_current_course": len(current_list),
+        "count_planned_course": len(planned_list),
         "student_cgpa": cgpa,
+        "semester_credits": sem_credits  # This returns {1: 15, 2: 12, etc.}
     }
 
 @router.get("/GPA/{student_id}/{semester_id}")
@@ -188,3 +229,4 @@ async def delete_student_coursecode(student_id:UUID, course_code:str):
         raise HTTPException(status_code=404, detail="Student not found")
     
     return {"message": f"Course {course_code} successfully deleted"}
+
