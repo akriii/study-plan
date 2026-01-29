@@ -66,7 +66,7 @@ class CourseRead(BaseModel):
     course_name: Optional[str] 
     course_code: Optional[str] 
     credit_hour: Optional[float] = 0.0 
-    pre_requisite: Optional[list[str]] = []
+    pre_requisite: Optional[Union[list[str], str]] = []
     
 class ReadSemesterCourse(BaseModel):
     semester: Optional[int]

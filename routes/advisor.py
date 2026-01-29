@@ -14,7 +14,7 @@ client = InferenceClient(
 )
 
 @router.get("/ai-advisor/{student_id}")
-async def get_hf_advisor(student_id: UUID):
+async def get__advisor(student_id: UUID):
     try:
         # Fetch data
         db_res = SUPABASE.table("STUDENT_COURSE").select("*, COURSE(*)").eq("student_id", student_id).execute()
