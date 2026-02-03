@@ -65,15 +65,17 @@ class StudentCourseAdd(BaseModel):
 class CourseRead(BaseModel):
     course_name: Optional[str] 
     course_code: Optional[str] 
+    course_semester: Optional[str] = None
+    course_desc: Optional[str] = None
     credit_hour: Optional[float] = 0.0 
     pre_requisite: Optional[Union[list[str], str]] = []
     
 class ReadSemesterCourse(BaseModel):
-    semester: Optional[int]
-    course_code: Optional[str]
+    semester: Optional[int] 
+    course_code: Optional[str] = None
     student_id: Optional[UUID]
-    grade: Optional[str]
-    status: Optional[str]
+    grade: Optional[str] = None
+    status: Optional[str] = None
     COURSE: Optional[CourseRead] = None
 
 class UpdateStudentCourse(BaseModel):
