@@ -55,7 +55,7 @@ def Get_Probation_Status(student_id: str, target_semester: str):
     """
     # Define the chronological order of your semesters
     # Adjust this list to match exactly how they are named in your database
-    semester_order = ["1", "2", "3", "4", "5", "6", "7", "Internship", "8", "9", "10"]
+    semester_order = ["1", "2", "3", "4", "5", "6", "7", "Student Industrial Internship Programme", "8", "9", "10"]
 
     # If the current semester isn't in our list or is the first one, no probation check needed
     if target_semester not in semester_order or target_semester == semester_order[0]:
