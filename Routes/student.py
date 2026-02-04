@@ -28,10 +28,7 @@ async def register_student(student: StudentCreate):
         auth_response = SUPABASE.auth.sign_up({
             "email": student.student_email,
             "password": student.student_password,
-            #"options": {
-            #link must be url to verified page that has been designed by react
-                #"email_redirect_to": "http://localhost:3000/verified"
-            #},
+            
         })
 
         if not auth_response.user:
