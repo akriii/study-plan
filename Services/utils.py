@@ -51,34 +51,35 @@ def Calc_Cgpa(completed_count: list):
 def Get_Probation_Status(student_id: str, target_semester: str):
     """
     Checks the GPA of the semester immediately preceding target_semester.
-    Returns (is_probation, credit_limit)
+    Probation is only applied if the previous semester is FULLY COMPLETED with GPA < 2.00.
     """
-    # Define the chronological order of your semesters
-    # Adjust this list to match exactly how they are named in your database
     semester_order = ["1", "2", "3", "4", "5", "6", "7", "Student Industrial Internship Programme", "8", "9", "10"]
 
-    # If the current semester isn't in our list or is the first one, no probation check needed
     if target_semester not in semester_order or target_semester == semester_order[0]:
         return False, 15
 
-    # Find the index of the current semester and get the one before it
     current_index = semester_order.index(target_semester)
     prev_sem = semester_order[current_index - 1]
 
-    # Query Supabase using the string value for prev_sem
+    # Fetch courses from the previous semester
     response = SUPABASE.table("STUDENT_COURSE") \
         .select("*, COURSE(credit_hour)") \
         .eq("student_id", student_id) \
         .eq("semester", prev_sem) \
-        .eq("status", "Completed") \
         .execute()
 
     if not response.data:
         return False, 15 
 
+    # If any course in the previous semester is NOT 'Completed', we don't apply probation yet.
+    is_prev_sem_finalized = all(record.get("status") == "Completed" for record in response.data)
+
+    if not is_prev_sem_finalized:
+        return False, 15
+
     gpa = Calc_Gpa(response.data)
     
-    # Check if GPA is below 2.00
     if gpa < 2.00:
-        return True, 11  # Probation Limit
-    return False, 15   # Normal Limit
+        return True, 11  
+    
+    return False, 15   
