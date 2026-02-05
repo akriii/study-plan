@@ -41,8 +41,8 @@ async def get__advisor(student_id: UUID):
             "EXECUTIVE SUMMARY. Do not list every course individually. The paragraph can only contain around 100 to 200 words only.Instead, "
             "group your findings into three sections: \n"
             "1. Overall Academic Standing (One paragraph)\n"
-            "2. Critical Priorities (Specific subjects to focus on based on low grades or credit weight)\n"
-            "3. Future Planning (Advice for 'Planned' courses and prerequisites)\n"
+            "2. Critical Priorities (Specific course code to focus on based on low grades or credit weight)\n"
+            "3. Future Planning (Advice for 'Planned' course code and prerequisites)\n"
             "4. A 3-sentence motivational closing."
         )
 
