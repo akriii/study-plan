@@ -36,6 +36,7 @@ async def get_semester_course(student_id: str, semester: int):
 #add new student_course based on pre-requisite
 @router.post("/add")
 async def add_student_course(course: StudentCourseAdd):
+    # 1. Fetch Course Info
     course_query = SUPABASE.table("COURSE").select("*").eq("course_code", course.course_code).single().execute()
     if not course_query.data:
         raise HTTPException(status_code=404, detail="Course code not found")
@@ -43,6 +44,7 @@ async def add_student_course(course: StudentCourseAdd):
     new_course_credits = course_query.data.get("credit_hour", 0)
     raw_pre_reqs = course_query.data.get("pre_requisite")
     
+    # 2. Normalize Pre-reqs
     if isinstance(raw_pre_reqs, str):
         pre_reqs = [raw_pre_reqs.strip()] if raw_pre_reqs.strip() else []
     elif isinstance(raw_pre_reqs, list):
@@ -50,6 +52,7 @@ async def add_student_course(course: StudentCourseAdd):
     else:
         pre_reqs = []
 
+    # 3. Check Academic Status & Limits
     is_probation, max_limit = Get_Probation_Status(str(course.student_id), course.semester)
     
     current_sem_res = SUPABASE.table("STUDENT_COURSE") \
@@ -59,31 +62,27 @@ async def add_student_course(course: StudentCourseAdd):
     
     _, current_credits = calculate_points_and_credits(current_sem_res.data)
     
-    if (current_credits + new_course_credits) > max_limit:
-        status_msg = "Probation" if is_probation else "Normal"
-        raise HTTPException(
-            status_code=400, 
-            detail=f"Credit Limit Exceeded! Current {status_msg} limit is {max_limit} hours."
-        )
+    # 4. Prerequisite Logic
+    has_passed_all_prereqs = True
+    missing_prereqs = []
 
-    warning_note = None
     if pre_reqs:
         for pre_code in pre_reqs:
             history = SUPABASE.table("STUDENT_COURSE").select("grade, status") \
                 .eq("student_id", course.student_id) \
                 .eq("course_code", pre_code).execute()
             
-            # Check if passed
-            has_passed = False
+            passed = False
             if history.data:
                 record = history.data[0]
                 if record["status"] == "Completed" and record["grade"] not in ["F", "Fail", None]:
-                    has_passed = True
+                    passed = True
             
-            if not has_passed:
-                
-                warning_note = f"Prerequisite {pre_code} not met. Chair Department approval required."
+            if not passed:
+                has_passed_all_prereqs = False
+                missing_prereqs.append(pre_code)
 
+    # 5. Insert Record
     if course.grade and course.grade.strip():
         course.status = "Completed"
     
@@ -99,10 +98,18 @@ async def add_student_course(course: StudentCourseAdd):
         response = SUPABASE.table("STUDENT_COURSE").insert(new_enrollment).execute()
         result = response.data[0]
         
-        if warning_note:
-            result["notification"] = warning_note
-            
-        return result
+        return {
+            "success": True,
+            "data": result,
+            "academic_meta": {
+                "is_probation": is_probation,
+                "max_limit": max_limit,
+                "current_total_credits": current_credits + new_course_credits,
+                "limit_exceeded": (current_credits + new_course_credits) > max_limit,
+                "prereqs_met": has_passed_all_prereqs,
+                "missing_prereqs": missing_prereqs
+            }
+        }
     except Exception:
         raise HTTPException(status_code=400, detail="Course already exists in your records.")
 
