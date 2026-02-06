@@ -26,12 +26,19 @@ class StudentRead(BaseModel):
     student_GOT: Optional[date] = None
     intake_session: Optional[date] = None
     
+class AcademicMeta(BaseModel):
+    is_probation: bool
+    max_limit: int
+    current_semester: str
+    status_label: str
+
 class Summary(BaseModel):
-    count_completed_course: Optional[int]
-    count_current_course: Optional[int]
-    count_planned_course: Optional[int]
-    student_cgpa: Optional[float]
-    semester_credits: Dict[int, int] 
+    count_completed_course: int
+    count_current_course: int
+    count_planned_course: int
+    student_cgpa: float
+    semester_credits: dict[str, int]
+    academic_meta: AcademicMeta 
 
 class SemesterSummary(BaseModel):
     total_credits: int

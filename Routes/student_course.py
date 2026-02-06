@@ -150,36 +150,50 @@ async def get_student_summary(student_id: UUID):
             "count_current_course": 0, 
             "count_planned_course": 0, 
             "student_cgpa": 0.0,
-            "semester_credits": {}
+            "semester_credits": {},
+            "academic_meta": {
+                "is_probation": False,
+                "max_limit": 15,
+                "status_label": "Normal"
+            }
         }
 
-    # Standard Status Filtering
+    # 1. Standard Status Filtering
     completed_list = [c for c in all_data if c["status"] == "Completed"]
     current_list = [c for c in all_data if c["status"] == "Current"]
     planned_list = [c for c in all_data if c["status"] == "Planned"]
     
-    # Semester Credit Hour Calculation
+    # 2. Semester Credit Hour Calculation
     sem_credits = {}
     for record in all_data:
-        sem = record.get("semester")
-        # Get credit hour from joined COURSE table
+        sem = str(record.get("semester")) # Keep as string for consistency
         course_info = record.get("COURSE") or {}
         credits = course_info.get("credit_hour", 0)
-        
-        if sem in sem_credits:
-            sem_credits[sem] += credits
-        else:
-            sem_credits[sem] = credits
+        sem_credits[sem] = sem_credits.get(sem, 0) + credits
 
-    # CGPA Calculation using your existing utils function
+    # 3. CGPA Calculation
     cgpa = Calc_Cgpa(completed_list)
+
+    try:
+        # Convert keys to int to find max, then back to string
+        latest_sem = str(max([int(s) for s in sem_credits.keys() if s.isdigit()] or [1]))
+    except ValueError:
+        latest_sem = "1"
+
+    is_probation, max_limit = Get_Probation_Status(str(student_id), latest_sem)
     
     return {
         "count_completed_course": len(completed_list),
         "count_current_course": len(current_list),
         "count_planned_course": len(planned_list),
         "student_cgpa": cgpa,
-        "semester_credits": sem_credits  # This returns {1: 15, 2: 12, etc.}
+        "semester_credits": sem_credits,
+        "academic_meta": {
+            "is_probation": is_probation,
+            "max_limit": max_limit,
+            "current_semester": latest_sem,
+            "status_label": "Probation" if is_probation else "Normal"
+        }
     }
 
 @router.get("/GPA/{student_id}/{semester_id}")
