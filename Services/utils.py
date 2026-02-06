@@ -53,12 +53,14 @@ def Get_Probation_Status(student_id: str, target_semester: str):
     Checks the GPA of the semester immediately preceding target_semester.
     Probation is only applied if the previous semester is FULLY COMPLETED with GPA < 2.00.
     """
+
+    target_sem_str = str(target_semester)
     semester_order = ["1", "2", "3", "4", "5", "6", "7", "Student Industrial Internship Programme", "8", "9", "10"]
 
-    if target_semester not in semester_order or target_semester == semester_order[0]:
+    if target_sem_str not in semester_order or target_sem_str == semester_order[0]:
         return False, 15
 
-    current_index = semester_order.index(target_semester)
+    current_index = semester_order.index(target_sem_str)
     prev_sem = semester_order[current_index - 1]
 
     # Fetch courses from the previous semester
