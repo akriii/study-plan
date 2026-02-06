@@ -37,7 +37,7 @@ async def get_semester_course(student_id: str, semester: int):
 @router.post("/add")
 async def add_student_course(course: StudentCourseAdd):
     # 1. Fetch Course Info
-    course_query = SUPABASE.table("COURSE").select("*").eq("course_code", course.course_code).single().execute()
+    course_query = SUPABASE.table("COURSE").select("*").eq("course_code", course.course_code).maybe_single().execute()
     if not course_query.data:
         raise HTTPException(status_code=404, detail="Course code not found")
     
