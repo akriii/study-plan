@@ -1,5 +1,7 @@
 from passlib.context import CryptContext
 from Database.database import SUPABASE
+from math import ceil
+from datetime import date, timedelta
 
 pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
 def HashPassword(password:str):
@@ -85,3 +87,43 @@ def Get_Probation_Status(student_id: str, target_semester: str):
         return True, 11  
     
     return False, 15   
+
+def calculate_got_details(intake_date: date, total_failed_credits: int):
+    BASE_SEMESTERS = 12
+    MONTHS_PER_SEMESTER = 4
+    CREDIT_LIMIT = 15
+
+    start_month = intake_date.month
+    start_year = intake_date.year
+    today = date.today()
+
+    extra_semesters = ceil(total_failed_credits / CREDIT_LIMIT) if total_failed_credits > 0 else 0
+    total_semesters = BASE_SEMESTERS + extra_semesters
+    total_months_duration = total_semesters * MONTHS_PER_SEMESTER
+
+    end_month = (start_month + total_months_duration - 1) % 12 + 1
+    year_increment = (start_month + total_months_duration - 1) // 12
+    end_year = start_year + year_increment
+    graduation_date = date(end_year, end_month, 1)
+
+    total_journey_months = (end_year - start_year) * 12 + (end_month - start_month)
+    
+    elapsed_months = (today.year - start_year) * 12 + (today.month - start_month)
+    
+    if total_journey_months > 0:
+        percentage = (elapsed_months / total_journey_months) * 100
+        percentage = max(0, min(100, round(percentage, 2)))
+    else:
+        percentage = 0
+
+    month_names = {1: "Jan", 5: "May", 9: "Sept"}
+    
+    return {
+        "intake_session": f"{month_names.get(start_month, 'Unknown')} {start_year}",
+        "adjusted_graduation": f"{month_names.get(end_month, 'Unknown')} {end_year}",
+        "total_months": total_journey_months,
+        "months_elapsed": elapsed_months,
+        "progress_percentage": percentage,
+        "extra_semesters": extra_semesters,
+        "is_delayed": extra_semesters > 0
+    }

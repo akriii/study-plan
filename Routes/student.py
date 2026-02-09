@@ -5,6 +5,7 @@ from uuid import UUID
 from fastapi.encoders import jsonable_encoder
 from datetime import date, datetime
 from dotenv import load_dotenv
+from Services.utils import calculate_got_details
 import os
 
 load_dotenv()
@@ -102,20 +103,6 @@ async def upload_student_image(student_id: UUID, file: UploadFile = File(...)):
     except Exception as e:
         raise HTTPException(status_code=500, detail=f"Image upload failed: {str(e)}")
 
-"""
-@router.put("/update_intake/{student_id}") 
-async def update_got(student_id: UUID, data: StudentCalcGOT):
-    
-    clean_payload = data.model_dump(mode='json')
-    
-    response = SUPABASE.table("STUDENT") \
-        .update(clean_payload) \
-        .eq("student_id", student_id) \
-        .execute()
-
-    return jsonable_encoder(response.data)
-"""
-
 # Route for student login
 @router.post("/login")
 async def login_student(student: StudentLogin):
@@ -170,3 +157,36 @@ async def delete_student(student_id:UUID):
     
     return {"message": f"Student {student_id} successfully deleted"}
 
+
+@router.get("/get/graduate-on-time/{student_id}")
+async def get_student_got_status(student_id: UUID):
+    # 1. Get Intake Date
+    student_query = SUPABASE.table("STUDENT")\
+        .select("intake_session")\
+        .eq("student_id", student_id)\
+        .maybe_single().execute()
+    
+    if not student_query.data or not student_query.data.get("intake_session"):
+        raise HTTPException(status_code=404, detail="Intake session date missing.")
+
+    intake_date = date.fromisoformat(student_query.data["intake_session"])
+
+    # 2. Sum Unresolved Failed Credits
+    failed_courses = SUPABASE.table("STUDENT_COURSE")\
+        .select("COURSE(credit_hour)")\
+        .eq("student_id", student_id)\
+        .eq("grade", "F")\
+        .execute()
+    
+    total_failed_credits = sum(
+        item.get("COURSE", {}).get("credit_hour", 0) 
+        for item in failed_courses.data if item.get("COURSE")
+    )
+
+    # 3. Get Analysis with Percentage
+    analysis = calculate_got_details(intake_date, total_failed_credits)
+
+    return {
+        "success": True,
+        "analysis": analysis
+    }

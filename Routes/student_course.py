@@ -13,6 +13,7 @@ async def read_student_course_specific(student_id:UUID, course_code:str):
         raise HTTPException(status_code=404, detail="Record not found")
     return response.data
 
+
 #route to get all course student_course data
 @router.get("/get/{student_id}", response_model=list[ReadSemesterCourse]) 
 async def read_student_course_all(student_id:UUID):
@@ -23,7 +24,7 @@ async def read_student_course_all(student_id:UUID):
 
 #get list of course taken by each semester
 @router.get("/get/SemesterCourse/{student_id}/{semester}", response_model=list[ReadSemesterCourse])
-async def get_semester_course(student_id: str, semester: int):
+async def get_semester_course(student_id: UUID, semester: int):
     response = SUPABASE.table("STUDENT_COURSE") \
     .select("*, COURSE(course_code ,course_name, credit_hour, course_type, course_semester, course_desc)")  \
     .eq("student_id", student_id) \
@@ -33,6 +34,31 @@ async def get_semester_course(student_id: str, semester: int):
         return []
     return response.data
 
+@router.get("/get/Standing/{student_id}/{semester}")
+async def get_academic_standing(student_id: UUID, semester: int):
+    """
+    Checks the previous semester's results to determine the credit limit 
+    for the requested semester.
+    """
+    is_probation, max_limit = Get_Probation_Status(str(student_id), semester)
+    
+    current_sem_res = SUPABASE.table("STUDENT_COURSE") \
+        .select("*, COURSE(credit_hour)") \
+        .eq("student_id", student_id) \
+        .eq("semester", semester).execute()
+    
+    _, enrolled_credits = calculate_points_and_credits(current_sem_res.data)
+
+    return {
+        "semester": semester,
+        "academic_meta": {
+            "is_probation": is_probation,
+            "max_limit": max_limit,
+            "enrolled_credits": enrolled_credits,
+            "remaining_credits": max(0, max_limit - enrolled_credits),
+            "status_label": "Probation" if is_probation else "Normal"
+        }
+    }
 #add new student_course based on pre-requisite
 @router.post("/add")
 async def add_student_course(course: StudentCourseAdd):
@@ -166,7 +192,7 @@ async def get_student_summary(student_id: UUID):
     # 2. Semester Credit Hour Calculation
     sem_credits = {}
     for record in all_data:
-        sem = str(record.get("semester")) # Keep as string for consistency
+        sem = str(record.get("semester")) 
         course_info = record.get("COURSE") or {}
         credits = course_info.get("credit_hour", 0)
         sem_credits[sem] = sem_credits.get(sem, 0) + credits
