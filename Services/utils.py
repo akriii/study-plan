@@ -88,42 +88,65 @@ def Get_Probation_Status(student_id: str, target_semester: str):
     
     return False, 15   
 
-def calculate_got_details(intake_date: date, total_failed_credits: int):
-    BASE_SEMESTERS = 12
-    MONTHS_PER_SEMESTER = 4
-    CREDIT_LIMIT = 15
+def calculate_got_details(intake_date: date, total_failed_credits: int, probation_count: int, total_degree_credits: int, completed_credits: int):
+    # 1. Constants and UTP Standards
+    NORMAL_CAPACITY = 15
+    PROBATION_CAPACITY = 11
+    TOTAL_SEMS = 12
+    INTERN_SEMS = 2
+    INTERN_CREDITS = 14  # 7 credits x 2 semesters
+    STUDY_SEMS = TOTAL_SEMS - INTERN_SEMS  # 10 study semesters
 
-    start_month = intake_date.month
-    start_year = intake_date.year
+    # 2. Track Timeline
     today = date.today()
-
-    extra_semesters = ceil(total_failed_credits / CREDIT_LIMIT) if total_failed_credits > 0 else 0
-    total_semesters = BASE_SEMESTERS + extra_semesters
-    total_months_duration = total_semesters * MONTHS_PER_SEMESTER
-
-    end_month = (start_month + total_months_duration - 1) % 12 + 1
-    year_increment = (start_month + total_months_duration - 1) // 12
-    end_year = start_year + year_increment
-    graduation_date = date(end_year, end_month, 1)
-
-    total_journey_months = (end_year - start_year) * 12 + (end_month - start_month)
+    start_month, start_year = intake_date.month, intake_date.year
+    months_passed = (today.year - start_year) * 12 + (today.month - start_month)
+    sems_passed = min(TOTAL_SEMS, months_passed // 4)
     
-    elapsed_months = (today.year - start_year) * 12 + (today.month - start_month)
+    # 3. Calculate 'Academic Work' Left
+    # We subtract intern credits from the total degree credits because they are handled separately
+    # Work left = (Remaining study credits) + (Credits from failed subjects to retake)
+    study_credits_needed = (total_degree_credits - INTERN_CREDITS - (completed_credits if completed_credits < (total_degree_credits - INTERN_CREDITS) else (total_degree_credits - INTERN_CREDITS))) + total_failed_credits
+
+    # 4. Calculate Available Study Capacity
+    # Remaining study semesters = Total study sems - (Study sems already passed)
+    # (Assuming the student isn't currently in an internship semester)
+    remaining_study_sems = max(0, STUDY_SEMS - min(STUDY_SEMS, sems_passed))
     
-    if total_journey_months > 0:
-        percentage = (elapsed_months / total_journey_months) * 100
-        percentage = max(0, min(100, round(percentage, 2)))
+    # Every past probation semester "stole" 4 credits of capacity from the 150-credit study bucket
+    probation_penalty = probation_count * (NORMAL_CAPACITY - PROBATION_CAPACITY)
+    
+    # Total available slots left in the standard 10 study semesters
+    available_study_slots = (remaining_study_sems * NORMAL_CAPACITY) - probation_penalty
+
+    # 5. Determine Extension (The 'Overflow' Logic)
+    if study_credits_needed > available_study_slots:
+        overflow_credits = study_credits_needed - available_study_slots
+        # Exceeding capacity by even 1 credit hour adds a semester
+        extra_semesters = ceil(overflow_credits / NORMAL_CAPACITY)
     else:
-        percentage = 0
+        extra_semesters = 0
+
+    # 6. Final Results
+    total_duration_sems = TOTAL_SEMS + extra_semesters
+    total_months = total_duration_sems * 4
+    
+    end_total_months = start_month + total_months - 1
+    end_month = (end_total_months % 12) + 1
+    end_year = start_year + (end_total_months // 12)
+    
+    percentage = (months_passed / total_months) * 100 if total_months > 0 else 0
+    percentage = max(0, min(100, round(percentage, 2)))
 
     month_names = {1: "Jan", 5: "May", 9: "Sept"}
-    
+
     return {
-        "intake_session": f"{month_names.get(start_month, 'Unknown')} {start_year}",
-        "adjusted_graduation": f"{month_names.get(end_month, 'Unknown')} {end_year}",
-        "total_months": total_journey_months,
-        "months_elapsed": elapsed_months,
+        "graduate_on_time_date": f"{month_names.get(end_month, 'Unknown')} {end_year}",
         "progress_percentage": percentage,
         "extra_semesters": extra_semesters,
-        "is_delayed": extra_semesters > 0
+        "meta": {
+            "study_credits_remaining": study_credits_needed,
+            "study_capacity_left": available_study_slots,
+            "intern_credits_handled": INTERN_CREDITS
+        }
     }
