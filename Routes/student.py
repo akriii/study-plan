@@ -160,34 +160,60 @@ async def delete_student(student_id:UUID):
 
 @router.get("/graduate-on-time/{student_id}")
 async def get_student_got_status(student_id: UUID):
-    # 1. Get Intake Date
-    student_query = SUPABASE.table("STUDENT").select("intake_session").eq("student_id", student_id).maybe_single().execute()
+    # 1. Get Student Intake and Profile Info
+    student_query = SUPABASE.table("STUDENT")\
+        .select("intake_session")\
+        .eq("student_id", student_id)\
+        .maybe_single().execute()
+    
+    if not student_query.data or not student_query.data.get("intake_session"):
+        raise HTTPException(status_code=404, detail="Intake session not found.")
+
     intake_date = date.fromisoformat(student_query.data["intake_session"])
 
-    # 2. Get All Semester Summaries to count Probation Semesters
-    # We check how many semesters had a GPA < 2.0
-    all_courses = SUPABASE.table("STUDENT_COURSE").select("semester, grade, status, COURSE(credit_hour)").eq("student_id", student_id).execute()
+    # 2. Get All Course Records to calculate probation and earned credits
+    all_courses = SUPABASE.table("STUDENT_COURSE")\
+        .select("semester, grade, status, COURSE(credit_hour)")\
+        .eq("student_id", student_id).execute()
     
-    # Group by semester and calculate GPA for each
+    # Standard degree target for a CS student like you is 164 credits
+    TOTAL_DEGREE_TARGET = 164 
+    
     semesters = {}
-    for c in all_courses.data:
-        sem = c['semester']
-        if sem not in semesters: semesters[sem] = []
-        semesters[sem].append(c)
-    
-    probation_count = 0
+    completed_credits = 0
     total_failed_credits = 0
     
-    for sem_id, courses in semesters.items():
-        # Count failures
-        total_failed_credits += sum(item.get("COURSE", {}).get("credit_hour", 0) for item in courses if item.get("grade") == "F")
+    for c in all_courses.data:
+        sem = c['semester']
+        course_info = c.get("COURSE", {})
+        credits = course_info.get("credit_hour", 0)
         
-        # Check if this semester resulted in probation
+        if sem not in semesters: semesters[sem] = []
+        semesters[sem].append(c)
+        
+        # Track credits earned toward the degree
+        if c.get("status") == "Completed" and c.get("grade") not in ["F", "Fail", None]:
+            completed_credits += credits
+            
+        # Track failed credits for the debt calculation
+        if c.get("grade") == "F":
+            total_failed_credits += credits
+    
+    # 3. Calculate Probation Count
+    probation_count = 0
+    for sem_id, courses in semesters.items():
         if all(c.get("status") == "Completed" for c in courses):
+            # Using your existing Calc_Gpa utility
             if Calc_Gpa(courses) < 2.00:
                 probation_count += 1
 
-    # 3. Calculate Analysis
-    analysis = calculate_got_details(intake_date, total_failed_credits, probation_count)
+    # 4. THE FIX: Pass all 5 required arguments
+    analysis = calculate_got_details(
+        intake_date=intake_date, 
+        total_failed_credits=total_failed_credits, 
+        probation_count=probation_count,
+        total_degree_credits=TOTAL_DEGREE_TARGET,
+        completed_credits=completed_credits
+    )
 
     return {"success": True, "analysis": analysis}
