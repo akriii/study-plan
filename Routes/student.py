@@ -157,7 +157,6 @@ async def delete_student(student_id:UUID):
     
     return {"message": f"Student {student_id} successfully deleted"}
 
-
 @router.get("/graduate-on-time/{student_id}")
 async def get_student_got_status(student_id: UUID):
     # 1. Get Student Intake and Profile Info
@@ -171,49 +170,34 @@ async def get_student_got_status(student_id: UUID):
 
     intake_date = date.fromisoformat(student_query.data["intake_session"])
 
-    # 2. Get All Course Records to calculate probation and earned credits
+    # 2. Get All Course Records (Raw data for the helper to analyze)
     all_courses = SUPABASE.table("STUDENT_COURSE")\
-        .select("semester, grade, status, COURSE(credit_hour)")\
+        .select("course_code, semester, grade, status, COURSE(credit_hour)")\
         .eq("student_id", student_id).execute()
     
-    
-    TOTAL_DEGREE_TARGET = 164 
-    
+    if not all_courses.data:
+        return {"success": True, "analysis": "No course history found."}
+
+    # 3. Calculate Probation Count (Keep this logic in the route)
     semesters = {}
-    completed_credits = 0
-    total_failed_credits = 0
-    
     for c in all_courses.data:
         sem = c['semester']
-        course_info = c.get("COURSE", {})
-        credits = course_info.get("credit_hour", 0)
-        
         if sem not in semesters: semesters[sem] = []
         semesters[sem].append(c)
-        
-        # Track credits earned toward the degree
-        if c.get("status") == "Completed" and c.get("grade") not in ["F", "Fail", None]:
-            completed_credits += credits
-            
-        # Track failed credits for the debt calculation
-        if c.get("grade") == "F":
-            total_failed_credits += credits
     
-    # 3. Calculate Probation Count
     probation_count = 0
     for sem_id, courses in semesters.items():
         if all(c.get("status") == "Completed" for c in courses):
-            # Using your existing Calc_Gpa utility
             if Calc_Gpa(courses) < 2.00:
                 probation_count += 1
 
-    # 4. THE FIX: Pass all 5 required arguments
+    # 4. THE FIX: Pass the raw list of courses into the analysis helper
+    # The helper now handles retakes and credit debt internally.
     analysis = calculate_got_details(
         intake_date=intake_date, 
-        total_failed_credits=total_failed_credits, 
+        all_student_courses=all_courses.data, # Changed this!
         probation_count=probation_count,
-        total_degree_credits=TOTAL_DEGREE_TARGET,
-        completed_credits=completed_credits
+        total_degree_credits=164 
     )
 
     return {"success": True, "analysis": analysis}
