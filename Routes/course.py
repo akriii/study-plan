@@ -6,63 +6,129 @@ import json
 
 router = APIRouter()
 
-@router.get("/get/department/{department_name}", response_model=list[CourseRead])
-async def read_courses_by_department(department_name: str):
-    # Manually convert the list to a JSON string: ["CEE"]
-    json_query = json.dumps([department_name]) 
-    
-    # Pass the stringified JSON directly to the filter
-    response = SUPABASE.table("COURSE") \
-        .select("*") \
-        .contains("course_department", json_query) \
+
+async def get_available_courses_by_type(student_id: UUID, course_type: str):
+    # 1. Fetch Student's Department from the STUDENT table
+    student_info = SUPABASE.table("STUDENT") \
+        .select("student_department") \
+        .eq("student_id", student_id) \
+        .maybe_single() \
         .execute()
     
+    if not student_info.data or not student_info.data.get("student_department"):
+        raise HTTPException(status_code=404, detail="Student department not found. Please update profile.")
+    
+    dept_name = student_info.data["student_department"]
+
+    # 2. Fetch Student History (To check prerequisites)
+    history_res = SUPABASE.table("STUDENT_COURSE") \
+        .select("course_code, status") \
+        .eq("student_id", student_id) \
+        .execute()
+    
+    planning_eligibility = {
+        record["course_code"] for record in history_res.data 
+        if record["status"] in ["Completed", "Current", "Planned"]
+    }
+
+    taken_or_planned = {
+        record["course_code"] for record in history_res.data 
+        if record["status"] in ["Current", "Completed", "Planned"]
+    }
+
+    # 3. Fetch Department-Specific Courses by Type
+    json_dept_query = json.dumps([dept_name])
+    
+    all_courses_res = SUPABASE.table("COURSE") \
+        .select("*") \
+        .eq("course_type", course_type) \
+        .contains("course_department", json_dept_query) \
+        .execute()
+    
+    if not all_courses_res.data:
+        return []
+
+    processed_courses = []
+    for course in all_courses_res.data:
+        code = course["course_code"]
+        if code in taken_or_planned:
+            continue
+            
+        # Prerequisite Logic
+        pre_reqs = course.get("pre_requisite")
+        cleaned_pre_reqs = [pre_reqs] if isinstance(pre_reqs, str) else (pre_reqs or [])
+        course["pre_requisite"] = cleaned_pre_reqs
+
+        # Lock/Unlock Logic
+        course["is_unlocked"] = not cleaned_pre_reqs or all(pre in planning_eligibility for pre in cleaned_pre_reqs)
+        processed_courses.append(course)
+
+    return processed_courses
+
+async def get_courses_by_student_context(student_id: UUID, course_type: str):
+    """
+    Smarter helper that looks up the student's department first, 
+    then filters the global COURSE table.
+    """
+    # 1. Fetch Student's Department
+    student_query = SUPABASE.table("STUDENT") \
+        .select("department") \
+        .eq("student_id", student_id) \
+        .maybe_single() \
+        .execute()
+    
+    if not student_query.data or not student_query.data.get("department"):
+        raise HTTPException(
+            status_code=404, 
+            detail="Student department not found. Please set your department in your profile."
+        )
+    
+    dept_name = student_query.data["department"]
+
+    # 2. Query COURSE table using Type and Department JSONB filter
+    # We manually stringify the JSON list for PostgreSQL
+    json_dept_query = json.dumps([dept_name])
+
+    response = SUPABASE.table("COURSE") \
+        .select("*") \
+        .ilike("course_type", course_type.strip()) \
+        .contains("course_department", json_dept_query) \
+        .execute()
+
     if not response.data:
         raise HTTPException(
             status_code=404, 
-            detail=f"No courses found for the {department_name} department."
+            detail=f"No {course_type} courses found for the {dept_name} department."
         )
-
-    # Standard normalization for prerequisites
+    
+    # 3. Data Normalization
     for course in response.data:
-        # Handle pre_requisite cleaning
         pre_req = course.get("pre_requisite")
-        if isinstance(pre_req, str):
-            course["pre_requisite"] = [pre_req]
-        elif pre_req is None:
-            course["pre_requisite"] = []
-            
+        course["pre_requisite"] = [pre_req] if isinstance(pre_req, str) else (pre_req or [])
+        
     return response.data
 
-async def get_courses(course_type: str):
-    response = SUPABASE.table("COURSE").select("*").ilike("course_type", course_type.strip()).execute()
-    if not response.data:
-        raise HTTPException(status_code=404, detail="Courses not found")
-    return response.data
-#get core discipline course information
-@router.get("/get/CoreDiscipline")
-async def read_all_core_discipline_courses():
-    return await get_courses("CD")
+# --- Simplified Routes ---
 
-#get core specialization course information only
-@router.get("/get/CoreSpecialization")
-async def read_all_core_specialization_courses():
-    return await get_courses("CSp")
+@router.get("/get/CoreDiscipline/{student_id}")
+async def read_core_discipline(student_id: UUID):
+    return await get_courses_by_student_context(student_id, "CD")
 
-#get university requirement course information only
-@router.get("/get/UniversityRequirement")
-async def read_all_university_requirement_courses():
-    return await get_courses("UR")
+@router.get("/get/CoreSpecialization/{student_id}")
+async def read_core_specialization(student_id: UUID):
+    return await get_courses_by_student_context(student_id, "CSp")
 
-#get national requirement course information only
-@router.get("/get/NationalRequirement")
-async def read_all_national_requirement_courses():
-    return await get_courses("NR")
+@router.get("/get/UniversityRequirement/{student_id}")
+async def read_university_requirement(student_id: UUID):
+    return await get_courses_by_student_context(student_id, "UR")
 
-#get common course information only
-@router.get("/get/CommonCourse")
-async def read_all_common_course_courses():
-    return await get_courses("CC")
+@router.get("/get/NationalRequirement/{student_id}")
+async def read_national_requirement(student_id: UUID):
+    return await get_courses_by_student_context(student_id, "NR")
+
+@router.get("/get/CommonCourse/{student_id}")
+async def read_common_courses(student_id: UUID):
+    return await get_courses_by_student_context(student_id, "CC")
 
 #get specific course information
 @router.get("/get/{course_code}", response_model=list[CourseRead]) #@router is a sub mdodule of FastAPI to handle routes
@@ -73,26 +139,42 @@ async def get_specific_course(course_code:str):
     return response.data
 
 async def get_available_courses_by_type(student_id: UUID, course_type: str):
+    # 1. Look up student's department
+    student_query = SUPABASE.table("STUDENT") \
+        .select("student_department") \
+        .eq("student_id", student_id) \
+        .maybe_single() \
+        .execute()
+    
+    if not student_query.data or not student_query.data.get("student_department"):
+        raise HTTPException(status_code=404, detail="Student department not found in profile.")
+    
+    dept_name = student_query.data["student_department"]
+
+    # 2. Fetch Student History for prerequisites
     history_res = SUPABASE.table("STUDENT_COURSE") \
         .select("course_code, grade, status") \
         .eq("student_id", student_id) \
         .execute()
     
-    # 1. These are the courses that "unlock" future ones
     planning_eligibility = {
         record["course_code"] for record in history_res.data 
         if record["status"] in ["Completed", "Current", "Planned"]
     }
 
-    # 2. These are courses already in the student's list (don't show these at all)
     taken_or_planned = {
         record["course_code"] for record in history_res.data 
         if record["status"] in ["Current", "Completed", "Planned"]
     }
 
+    # 3. Fetch courses filtered by Type AND Department
+    # Use json.dumps to ensure the JSONB containment check is syntactically correct
+    json_dept_query = json.dumps([dept_name])
+
     all_courses_res = SUPABASE.table("COURSE") \
         .select("*") \
         .eq("course_type", course_type) \
+        .contains("course_department", json_dept_query) \
         .execute()
     
     if not all_courses_res.data:
@@ -102,30 +184,18 @@ async def get_available_courses_by_type(student_id: UUID, course_type: str):
 
     for course in all_courses_res.data:
         code = course["course_code"]
-        
-        # We still skip courses the student is ALREADY taking/planned
         if code in taken_or_planned:
             continue
             
+        # Normalize pre_reqs
         pre_reqs = course.get("pre_requisite")
-        
-        # Normalize pre_reqs to a list
-        if isinstance(pre_reqs, str):
-            cleaned_pre_reqs = [pre_reqs.strip()] if pre_reqs.strip() else []
-        elif isinstance(pre_reqs, list):
-            cleaned_pre_reqs = [p.strip() for p in pre_reqs if p.strip()]
-        else:
-            cleaned_pre_reqs = []
-
+        cleaned_pre_reqs = [pre_reqs] if isinstance(pre_reqs, str) else (pre_reqs or [])
         course["pre_requisite"] = cleaned_pre_reqs
 
-        # 3. THE KEY CHANGE: Add a status flag instead of filtering
-        # Check if all prerequisites are in the planning_eligibility set
+        # Lock/Unlock Logic
         is_eligible = not cleaned_pre_reqs or all(pre in planning_eligibility for pre in cleaned_pre_reqs)
-        
         course["is_unlocked"] = is_eligible
         
-        # We now append EVERYTHING that isn't already taken
         processed_courses.append(course)
 
     return processed_courses

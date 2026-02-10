@@ -14,6 +14,7 @@ class StudentCreate(BaseModel):
     student_password: str 
     student_image: Optional[str] = None
     student_GOT: Optional[Any] = None
+    student_department: Optional[str] = None
     
 class StudentCalcGOT(BaseModel):
     intake_session: Optional[Any]
@@ -25,6 +26,7 @@ class StudentRead(BaseModel):
     student_image: Optional[str] = None
     student_GOT: Optional[date] = None
     intake_session: Optional[date] = None
+    student_department: Optional[str] = None
     
 class AcademicMeta(BaseModel):
     is_probation: bool
@@ -53,6 +55,7 @@ class StudentUpdate(BaseModel):
     student_image: Optional[str] = None
     student_name: Optional[str] = None
     intake_session: Optional[Union[date, str]] = None
+    student_department: Optional[str] = None
 
 class StudentRemove(BaseModel):
     student_id: UUID
@@ -61,6 +64,7 @@ class StudentRemove(BaseModel):
     student_password: str 
     student_image: Optional[str] = None
     student_GOT: Optional[date] = None
+    student_department: Optional[str] = None
     
 class StudentCourseAdd(BaseModel):
     student_id: UUID
@@ -96,11 +100,11 @@ class SemesterRemove(BaseModel):
     message:str
 
 class CourseCreate(BaseModel):
-    course_name: str  # Mandatory for new courses
-    course_code: str  # Mandatory primary key
+    course_name: str  
+    course_code: str  
     course_semester: Optional[str] = None
     course_desc: Optional[str] = None
-    course_type: str  # Needed for your CD, CSp, UR, NR filtering
+    course_type: str  
     credit_hour: float = 0.0
     pre_requisite: Optional[Union[list[str], str]] = []
     course_department: Optional[Union[list[str], str]] = []
