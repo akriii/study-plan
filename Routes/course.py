@@ -2,18 +2,19 @@ from fastapi import FastAPI,APIRouter, HTTPException
 from Database.database import SUPABASE
 from Model.models import  CourseRead, CourseCreate
 from uuid import UUID
-
+import json 
 
 router = APIRouter()
 
-# Updated route to fetch courses where the department is in the jsonb list
-# Updated route to correctly query JSONB arrays
 @router.get("/get/department/{department_name}", response_model=list[CourseRead])
 async def read_courses_by_department(department_name: str):
-    # The value must be a list to match the JSONB array structure
+    # Manually convert the list to a JSON string: ["CEE"]
+    json_query = json.dumps([department_name]) 
+    
+    # Pass the stringified JSON directly to the filter
     response = SUPABASE.table("COURSE") \
         .select("*") \
-        .contains("course_department", [department_name]) \
+        .contains("course_department", json_query) \
         .execute()
     
     if not response.data:
@@ -24,6 +25,7 @@ async def read_courses_by_department(department_name: str):
 
     # Standard normalization for prerequisites
     for course in response.data:
+        # Handle pre_requisite cleaning
         pre_req = course.get("pre_requisite")
         if isinstance(pre_req, str):
             course["pre_requisite"] = [pre_req]
