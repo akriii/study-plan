@@ -17,7 +17,7 @@ router = APIRouter() #defining a router for student-related routes
 #route to fetch student based on student id sent by react
 @router.get("/{student_id}", response_model=StudentRead) #@router is a sub mdodule of FastAPI to handle routes
 async def read_students(student_id:UUID):
-    response = SUPABASE.table("STUDENT").select("*").eq("student_id",student_id).single().execute() #query for get all students data
+    response = SUPABASE.table("STUDENT").select("*").eq("student_id",student_id).maybe_single().execute() #query for get all students data
     if not response.data:
         raise HTTPException(status_code=404, detail="Student not found")
         
