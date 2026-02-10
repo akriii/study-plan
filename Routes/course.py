@@ -72,18 +72,18 @@ async def get_courses_by_student_context(student_id: UUID, course_type: str):
     """
     # 1. Fetch Student's Department
     student_query = SUPABASE.table("STUDENT") \
-        .select("department") \
+        .select("student_department") \
         .eq("student_id", student_id) \
         .maybe_single() \
         .execute()
     
-    if not student_query.data or not student_query.data.get("department"):
+    if not student_query.data or not student_query.data.get("student_department"):
         raise HTTPException(
             status_code=404, 
             detail="Student department not found. Please set your department in your profile."
         )
     
-    dept_name = student_query.data["department"]
+    dept_name = student_query.data["student_department"]
 
     # 2. Query COURSE table using Type and Department JSONB filter
     # We manually stringify the JSON list for PostgreSQL
@@ -139,21 +139,21 @@ async def get_specific_course(course_code:str):
     return response.data
 
 async def get_available_courses_by_type(student_id: UUID, course_type: str):
-    # 1. Look up student's department
-    student_query = SUPABASE.table("STUDENT") \
+    # 1. Fetch Student's Department using the correct column name
+    student_info = SUPABASE.table("STUDENT") \
         .select("student_department") \
         .eq("student_id", student_id) \
         .maybe_single() \
         .execute()
     
-    if not student_query.data or not student_query.data.get("student_department"):
-        raise HTTPException(status_code=404, detail="Student department not found in profile.")
+    if not student_info.data or not student_info.data.get("student_department"):
+        raise HTTPException(status_code=404, detail="Student department not found. Please update profile.")
     
-    dept_name = student_query.data["student_department"]
+    dept_name = student_info.data["student_department"]
 
-    # 2. Fetch Student History for prerequisites
+    # 2. Fetch Student History (To check prerequisites and duplicates)
     history_res = SUPABASE.table("STUDENT_COURSE") \
-        .select("course_code, grade, status") \
+        .select("course_code, status") \
         .eq("student_id", student_id) \
         .execute()
     
@@ -167,10 +167,9 @@ async def get_available_courses_by_type(student_id: UUID, course_type: str):
         if record["status"] in ["Current", "Completed", "Planned"]
     }
 
-    # 3. Fetch courses filtered by Type AND Department
-    # Use json.dumps to ensure the JSONB containment check is syntactically correct
+    # 3. Fetch Department-Specific Courses by Type using JSONB filter
     json_dept_query = json.dumps([dept_name])
-
+    
     all_courses_res = SUPABASE.table("COURSE") \
         .select("*") \
         .eq("course_type", course_type) \
@@ -181,21 +180,18 @@ async def get_available_courses_by_type(student_id: UUID, course_type: str):
         return []
 
     processed_courses = []
-
     for course in all_courses_res.data:
         code = course["course_code"]
         if code in taken_or_planned:
             continue
             
-        # Normalize pre_reqs
+        # 4. Prerequisite and Status Logic
         pre_reqs = course.get("pre_requisite")
         cleaned_pre_reqs = [pre_reqs] if isinstance(pre_reqs, str) else (pre_reqs or [])
         course["pre_requisite"] = cleaned_pre_reqs
 
-        # Lock/Unlock Logic
-        is_eligible = not cleaned_pre_reqs or all(pre in planning_eligibility for pre in cleaned_pre_reqs)
-        course["is_unlocked"] = is_eligible
-        
+        # Eligibility Check (is_unlocked)
+        course["is_unlocked"] = not cleaned_pre_reqs or all(pre in planning_eligibility for pre in cleaned_pre_reqs)
         processed_courses.append(course)
 
     return processed_courses
