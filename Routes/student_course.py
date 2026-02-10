@@ -176,7 +176,7 @@ async def list_planned_course(student_id:UUID):
 async def get_student_summary(student_id: UUID):
     # Fetch records including the semester column
     response = SUPABASE.table("STUDENT_COURSE")\
-        .select("semester, grade, status, COURSE(credit_hour)")\
+        .select("course_code,semester, grade, status, COURSE(credit_hour)")\
         .eq("student_id", student_id)\
         .execute()
 
@@ -237,7 +237,7 @@ async def get_student_summary(student_id: UUID):
 @router.get("/GPA/{student_id}/{semester_id}")
 async def get_semester_gpa(student_id: UUID, semester_id: int):
     response = SUPABASE.table("STUDENT_COURSE")\
-        .select("grade, status, semester, COURSE(credit_hour)")\
+        .select("course_code, grade, status, semester, COURSE(credit_hour)")\
         .eq("student_id", student_id)\
         .eq("semester", semester_id)\
         .eq("status", "Completed")\
