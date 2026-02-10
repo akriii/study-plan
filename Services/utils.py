@@ -14,6 +14,7 @@ def VerifyPassword(plain_password:str, hashed_password:str):
 
 
 def calculate_points_and_credits(courses: list):
+    """Calculates total grade points and credits for a given list of courses."""
     GRADE_MAP = {
         "A": 4.00, "A-": 3.75, "B+": 3.50, "B": 3.00,
         "C+": 2.50, "C": 2.00, "D+": 1.50, "D": 1.00, "F": 0.00
@@ -23,15 +24,26 @@ def calculate_points_and_credits(courses: list):
     total_grade_points = 0
 
     for item in courses:
-        # Check both the top level and the joined COURSE object for credits
+        # Get credit hour from nested COURSE join
         course_info = item.get("COURSE") or {}
         credits = item.get("credit_hour") or course_info.get("credit_hour", 0)
         
         raw_grade = item.get("grade")
+
+        # --- FIXED LOGIC ---
+        # 1. If it's a non-empty string, check the GRADE_MAP
         if isinstance(raw_grade, str) and raw_grade.strip():
             quality_points = GRADE_MAP.get(raw_grade.upper().strip(), 0.00)
+        # 2. If it's an empty string or None, it's 0.00 points
+        elif raw_grade == "" or raw_grade is None:
+            quality_points = 0.00
+        # 3. Otherwise, try converting to float (for numeric grades)
         else:
-            quality_points = float(raw_grade) if raw_grade is not None else 0.00
+            try:
+                quality_points = float(raw_grade)
+            except (ValueError, TypeError):
+                quality_points = 0.00
+        # -------------------
 
         total_credits += credits
         total_grade_points += (quality_points * credits)
