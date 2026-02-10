@@ -76,6 +76,7 @@ class CourseRead(BaseModel):
     course_desc: Optional[str] = None
     credit_hour: Optional[float] = 0.0 
     pre_requisite: Optional[Union[list[str], str]] = []
+    course_department: Optional[Union[list[str], str]] = []
     
 class ReadSemesterCourse(BaseModel):
     semester: Optional[int] 
@@ -93,3 +94,13 @@ class UpdateStudentCourse(BaseModel):
 
 class SemesterRemove(BaseModel):
     message:str
+
+class CourseCreate(BaseModel):
+    course_name: str  # Mandatory for new courses
+    course_code: str  # Mandatory primary key
+    course_semester: Optional[str] = None
+    course_desc: Optional[str] = None
+    course_type: str  # Needed for your CD, CSp, UR, NR filtering
+    credit_hour: float = 0.0
+    pre_requisite: Optional[Union[list[str], str]] = []
+    course_department: Optional[Union[list[str], str]] = []

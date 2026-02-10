@@ -5,10 +5,15 @@ from Services.utils import Calc_Cgpa, Get_Probation_Status, calculate_points_and
 from uuid import UUID
 
 router = APIRouter()
-#route to get sepcific course student_course data
-@router.get("/get/{student_id}/{course_code}", response_model=list[ReadSemesterCourse]) #@router is a sub mdodule of FastAPI to handle routes
-async def read_student_course_specific(student_id:UUID, course_code:str):
-    response = SUPABASE.table("STUDENT_COURSE").select("*, COURSE(course_code,course_name, credit_hour, course_type,pre_requisite, course_semester, course_desc)").eq("student_id",student_id).eq("course_code",course_code).execute() #query to get student_course and course data based on course_code
+@router.get("/get/{student_id}/{course_code}/{semester}", response_model=list[ReadSemesterCourse])
+async def read_student_course_specific(student_id: UUID, course_code: str, semester: int):
+    response = SUPABASE.table("STUDENT_COURSE")\
+        .select("*, COURSE(course_code,course_name, credit_hour, course_type,pre_requisite, course_semester, course_desc, course_department)")\
+        .eq("student_id", student_id)\
+        .eq("course_code", course_code)\
+        .eq("semester", semester)\
+        .execute() 
+        
     if not response.data:
         raise HTTPException(status_code=404, detail="Record not found")
     return response.data
@@ -17,7 +22,7 @@ async def read_student_course_specific(student_id:UUID, course_code:str):
 #route to get all course student_course data
 @router.get("/get/{student_id}", response_model=list[ReadSemesterCourse]) 
 async def read_student_course_all(student_id:UUID):
-    response = SUPABASE.table("STUDENT_COURSE").select("*, COURSE(course_code,course_name, credit_hour, course_type, pre_requisite, course_semester, course_desc)").eq("student_id",student_id).execute()
+    response = SUPABASE.table("STUDENT_COURSE").select("*, COURSE(course_code,course_name, credit_hour, course_type, pre_requisite, course_semester, course_desc, course_department)").eq("student_id",student_id).execute()
     if not response.data:
         raise HTTPException(status_code=404, detail="Record not found")
     return response.data
@@ -26,7 +31,7 @@ async def read_student_course_all(student_id:UUID):
 @router.get("/get/SemesterCourse/{student_id}/{semester}", response_model=list[ReadSemesterCourse])
 async def get_semester_course(student_id: UUID, semester: int):
     response = SUPABASE.table("STUDENT_COURSE") \
-    .select("*, COURSE(course_code ,course_name, credit_hour, course_type, course_semester, course_desc)")  \
+    .select("*, COURSE(course_code ,course_name, credit_hour, course_type, course_semester, course_desc, course_department)")  \
     .eq("student_id", student_id) \
     .eq("semester", semester) \
     .execute()
@@ -94,20 +99,24 @@ async def add_student_course(course: StudentCourseAdd):
 
     if pre_reqs:
         for pre_code in pre_reqs:
+            # Fetch ALL attempts for this prerequisite
             history = SUPABASE.table("STUDENT_COURSE").select("grade, status") \
                 .eq("student_id", course.student_id) \
                 .eq("course_code", pre_code).execute()
             
+            # Check if ANY of the attempts were successful
             passed = False
             if history.data:
-                record = history.data[0]
-                if record["status"] == "Completed" and record["grade"] not in ["F", "Fail", None]:
-                    passed = True
+                # We loop through all records to see if a pass exists
+                for record in history.data:
+                    if record["status"] == "Completed" and record["grade"] not in ["F", "Fail", None]:
+                        passed = True
+                        break # Found a pass, no need to check other attempts
             
             if not passed:
                 has_passed_all_prereqs = False
                 missing_prereqs.append(pre_code)
-
+                
     # 5. Insert Record
     if course.grade and course.grade.strip():
         course.status = "Completed"
@@ -140,7 +149,7 @@ async def add_student_course(course: StudentCourseAdd):
         raise HTTPException(status_code=400, detail="Course already exists in your records.")
 
 async def get_courses(student_id: UUID, status: str):
-    response = SUPABASE.table("STUDENT_COURSE").select("*, COURSE(course_code,course_name, credit_hour, course_type, pre_requisite)").eq("student_id",student_id).eq("status",status).execute()
+    response = SUPABASE.table("STUDENT_COURSE").select("*, COURSE(course_code,course_name, credit_hour, course_type, pre_requisite, course_department)").eq("student_id",student_id).eq("status",status).execute()
 
     if not response.data:
         return []
@@ -245,14 +254,20 @@ async def get_semester_gpa(student_id: UUID, semester_id: int):
         "student_gpa": gpa
     }
 
-#edit student course details
-@router.put("/update/StudentCourse/{student_id}/{course_code}", response_model=list[UpdateStudentCourse])
-async def edit_student_course(student_id:UUID, course_code:str, studentcourse_data: UpdateStudentCourse ):
+@router.put("/update/StudentCourse/{student_id}/{course_code}/{semester}", response_model=list[UpdateStudentCourse])
+async def edit_student_course(student_id: UUID, course_code: str, semester: int, studentcourse_data: UpdateStudentCourse):
     data = studentcourse_data.model_dump(exclude_unset=True)
 
-    response = SUPABASE.table("STUDENT_COURSE").update(data).eq("student_id",student_id).eq("course_code",course_code).execute()
+    # Added .eq("semester", semester) to target the specific record
+    response = SUPABASE.table("STUDENT_COURSE")\
+        .update(data)\
+        .eq("student_id", student_id)\
+        .eq("course_code", course_code)\
+        .eq("semester", semester)\
+        .execute()
+        
     if not response.data:
-        raise HTTPException(status_code=404, detail="Student courses not found")
+        raise HTTPException(status_code=404, detail="Specific student course record not found")
     
     return response.data
 #delete entire semester
@@ -267,13 +282,19 @@ async def delete_semester(student_id:UUID, semester: int):
     return {"message": f"Semester {semester} successfully deleted"}
 
 #delete course in student_course table
-@router.delete("/delete/course/{student_id}/{course_code}", response_model=SemesterRemove)
-async def delete_student_coursecode(student_id:UUID, course_code:str):
+# Updated route to include semester
+@router.delete("/delete/course/{student_id}/{course_code}/{semester}", response_model=SemesterRemove)
+async def delete_student_coursecode(student_id: UUID, course_code: str, semester: int):
     
-
-    response = SUPABASE.table("STUDENT_COURSE").delete().eq("student_id",student_id).eq("course_code", course_code).execute()
+    # Added .eq("semester", semester)
+    response = SUPABASE.table("STUDENT_COURSE")\
+        .delete()\
+        .eq("student_id", student_id)\
+        .eq("course_code", course_code)\
+        .eq("semester", semester)\
+        .execute()
+        
     if not response.data:
-        raise HTTPException(status_code=404, detail="Student not found")
+        raise HTTPException(status_code=404, detail="Record not found")
     
-    return {"message": f"Course {course_code} successfully deleted"}
-
+    return {"message": f"Course {course_code} in Semester {semester} successfully deleted"}

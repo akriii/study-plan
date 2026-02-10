@@ -45,9 +45,29 @@ def Calc_Gpa(courses: list):
     points, credits = calculate_points_and_credits(courses)
     return round(points / credits, 2) if credits > 0 else 0.00
 
-def Calc_Cgpa(completed_count: list):
-    """Calculates CGPA across all semesters."""
-    points, credits = calculate_points_and_credits(completed_count)
+def Calc_Cgpa(completed_list: list):
+    """
+    Calculates CGPA across all semesters, ensuring only the latest attempt 
+    of a repeated course is counted.
+    """
+    if not completed_list:
+        return 0.00
+
+    # 1. Group by course_code to find all attempts
+    latest_attempts = {}
+    for record in completed_list:
+        code = record.get("course_code")
+        # Ensure semester is treated as an integer for comparison
+        sem = int(record.get("semester", 0))
+        
+        if code not in latest_attempts or sem > int(latest_attempts[code].get("semester", 0)):
+            latest_attempts[code] = record
+
+    # 2. Extract only the latest unique attempts
+    unique_latest_courses = list(latest_attempts.values())
+
+    # 3. Standard calculation using your existing utility
+    points, credits = calculate_points_and_credits(unique_latest_courses)
     return round(points / credits, 2) if credits > 0 else 0.00
 
 def Get_Probation_Status(student_id: str, target_semester: str):
@@ -88,7 +108,9 @@ def Get_Probation_Status(student_id: str, target_semester: str):
     
     return False, 15   
 
-def calculate_got_details(intake_date: date, total_failed_credits: int, probation_count: int, total_degree_credits: int, completed_credits: int):
+
+
+def calculate_got_details(intake_date: date, all_student_courses: list, probation_count: int, total_degree_credits: int):
     # 1. Constants and UTP Standards
     NORMAL_CAPACITY = 15
     PROBATION_CAPACITY = 11
@@ -97,37 +119,58 @@ def calculate_got_details(intake_date: date, total_failed_credits: int, probatio
     INTERN_CREDITS = 14  # 7 credits x 2 semesters
     STUDY_SEMS = TOTAL_SEMS - INTERN_SEMS  # 10 study semesters
 
-    # 2. Track Timeline
+    # 2. Analyze Course History for Retakes
+    history = {}
+    for c in all_student_courses:
+        code = c.get("course_code")
+        if code not in history: 
+            history[code] = []
+        history[code].append(c)
+
+    total_failed_credits = 0
+    completed_credits = 0
+
+    for code, attempts in history.items():
+        # Sort by semester descending (latest first)
+        attempts.sort(key=lambda x: int(x.get("semester", 0)), reverse=True)
+        latest = attempts[0]
+        
+        # Check if they have EVER passed this subject
+        has_passed = any(a.get("status") == "Completed" and a.get("grade") not in ["F", "Fail", None] for a in attempts)
+        
+        credits = latest.get("COURSE", {}).get("credit_hour", 0)
+        
+        if has_passed:
+            completed_credits += credits
+        elif latest.get("grade") == "F":
+            # Only count as debt if the latest attempt is still a fail
+            total_failed_credits += credits
+
+    # 3. Track Timeline
     today = date.today()
     start_month, start_year = intake_date.month, intake_date.year
     months_passed = (today.year - start_year) * 12 + (today.month - start_month)
     sems_passed = min(TOTAL_SEMS, months_passed // 4)
     
-    # 3. Calculate 'Academic Work' Left
-    # We subtract intern credits from the total degree credits because they are handled separately
-    # Work left = (Remaining study credits) + (Credits from failed subjects to retake)
-    study_credits_needed = (total_degree_credits - INTERN_CREDITS - (completed_credits if completed_credits < (total_degree_credits - INTERN_CREDITS) else (total_degree_credits - INTERN_CREDITS))) + total_failed_credits
+    # 4. Calculate 'Academic Work' Left
+    # Work left = (Core credits not yet passed) + (Unresolved failures)
+    study_credits_needed = (total_degree_credits - INTERN_CREDITS - 
+                            min(completed_credits, total_degree_credits - INTERN_CREDITS)) + total_failed_credits
 
-    # 4. Calculate Available Study Capacity
-    # Remaining study semesters = Total study sems - (Study sems already passed)
-    # (Assuming the student isn't currently in an internship semester)
+    # 5. Calculate Capacity
     remaining_study_sems = max(0, STUDY_SEMS - min(STUDY_SEMS, sems_passed))
-    
-    # Every past probation semester "stole" 4 credits of capacity from the 150-credit study bucket
+    # Every probation semester reduces capacity by 4 credits
     probation_penalty = probation_count * (NORMAL_CAPACITY - PROBATION_CAPACITY)
-    
-    # Total available slots left in the standard 10 study semesters
     available_study_slots = (remaining_study_sems * NORMAL_CAPACITY) - probation_penalty
 
-    # 5. Determine Extension (The 'Overflow' Logic)
+    # 6. Determine Extension
     if study_credits_needed > available_study_slots:
         overflow_credits = study_credits_needed - available_study_slots
-        # Exceeding capacity by even 1 credit hour adds a semester
         extra_semesters = ceil(overflow_credits / NORMAL_CAPACITY)
     else:
         extra_semesters = 0
 
-    # 6. Final Results
+    # 7. Final Results
     total_duration_sems = TOTAL_SEMS + extra_semesters
     total_months = total_duration_sems * 4
     
@@ -144,9 +187,11 @@ def calculate_got_details(intake_date: date, total_failed_credits: int, probatio
         "graduate_on_time_date": f"{month_names.get(end_month, 'Unknown')} {end_year}",
         "progress_percentage": percentage,
         "extra_semesters": extra_semesters,
+        "is_delayed": extra_semesters > 0,
         "meta": {
             "study_credits_remaining": study_credits_needed,
             "study_capacity_left": available_study_slots,
-            "intern_credits_handled": INTERN_CREDITS
+            "unresolved_failed_credits": total_failed_credits,
+            "completed_study_credits": completed_credits
         }
     }

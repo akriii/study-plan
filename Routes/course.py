@@ -1,31 +1,35 @@
 from fastapi import FastAPI,APIRouter, HTTPException
 from Database.database import SUPABASE
-from Model.models import  CourseRead
+from Model.models import  CourseRead, CourseCreate
 from uuid import UUID
 
 
 router = APIRouter()
-#get all course information
-@router.get("/get", response_model=list[CourseRead])
-async def read_all_course():
-    response = SUPABASE.table("COURSE").select("*").execute()
+
+# Updated route to fetch courses where the department is in the jsonb list
+@router.get("/get/department/{department_name}", response_model=list[CourseRead])
+async def read_courses_by_department(department_name: str):
+    # The 'cs' filter checks if the jsonb array contains the department_name
+    response = SUPABASE.table("COURSE") \
+        .select("*") \
+        .contains("course_department", [department_name]) \
+        .execute()
     
     if not response.data:
-        raise HTTPException(status_code=404, detail="Course not found")
+        raise HTTPException(
+            status_code=404, 
+            detail=f"No courses found for the {department_name} department."
+        )
 
-    cleaned_data = []
+    # Standard normalization for prerequisites
     for course in response.data:
         pre_req = course.get("pre_requisite")
-
         if isinstance(pre_req, str):
             course["pre_requisite"] = [pre_req]
         elif pre_req is None:
             course["pre_requisite"] = []
-        
-        cleaned_data.append(course)
-
-    return cleaned_data
-
+            
+    return response.data
 async def get_courses(course_type: str):
     response = SUPABASE.table("COURSE").select("*").ilike("course_type", course_type.strip()).execute()
     if not response.data:
@@ -141,3 +145,55 @@ async def read_available_ur(student_id: UUID):
 @router.get("/get/CourseAvailable/CommonCourse/{student_id}", response_model=list[CourseRead])
 async def read_available_cc(student_id: UUID):
     return await get_available_courses_by_type(student_id, "CC")
+
+
+
+@router.post("/upsert")
+async def upsert_course_to_department(course: CourseCreate, department: str):
+    """
+    Adds a new course or links an existing course to a new department 
+    using the jsonb course_department list.
+    """
+    # 1. Check if the course already exists globally by its code
+    existing = SUPABASE.table("COURSE") \
+        .select("course_department") \
+        .eq("course_code", course.course_code) \
+        .maybe_single() \
+        .execute()
+
+    if existing.data:
+        # COURSE EXISTS: We only need to update the department list
+        current_depts = existing.data.get("course_department")
+        
+        # Normalize current_depts to a list if it's a string or None
+        if isinstance(current_depts, str):
+            current_depts = [current_depts]
+        elif current_depts is None:
+            current_depts = []
+            
+        if department not in current_depts:
+            current_depts.append(department)
+            
+            # Update only the department column
+            update_res = SUPABASE.table("COURSE") \
+                .update({"course_department": current_depts}) \
+                .eq("course_code", course.course_code) \
+                .execute()
+            
+            return {"message": f"Course linked to {department} successfully.", "data": update_res.data[0]}
+        
+        return {"message": "Course is already associated with this department."}
+
+    else:
+        # COURSE IS NEW
+        new_course_data = course.model_dump()
+        
+        # Ensure course_department is a list containing the initial department
+        new_course_data["course_department"] = [department]
+        
+        insert_res = SUPABASE.table("COURSE").insert(new_course_data).execute()
+        
+        if not insert_res.data:
+            raise HTTPException(status_code=400, detail="Failed to create new course.")
+            
+        return {"message": "New course created and assigned to department.", "data": insert_res.data[0]}

@@ -176,7 +176,7 @@ async def get_student_got_status(student_id: UUID):
         .select("semester, grade, status, COURSE(credit_hour)")\
         .eq("student_id", student_id).execute()
     
-    # Standard degree target for a CS student like you is 164 credits
+    
     TOTAL_DEGREE_TARGET = 164 
     
     semesters = {}
