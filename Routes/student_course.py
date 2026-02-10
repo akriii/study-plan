@@ -5,28 +5,6 @@ from Services.utils import Calc_Cgpa, Get_Probation_Status, calculate_points_and
 from uuid import UUID
 
 router = APIRouter()
-@router.get("/get/{student_id}/{course_code}/{semester}", response_model=list[ReadSemesterCourse])
-async def read_student_course_specific(student_id: UUID, course_code: str, semester: int):
-    response = SUPABASE.table("STUDENT_COURSE")\
-        .select("*, COURSE(course_code,course_name, credit_hour, course_type,pre_requisite, course_semester, course_desc, course_department)")\
-        .eq("student_id", student_id)\
-        .eq("course_code", course_code)\
-        .eq("semester", semester)\
-        .execute() 
-        
-    if not response.data:
-        raise HTTPException(status_code=404, detail="Record not found")
-    return response.data
-
-
-#route to get all course student_course data
-@router.get("/get/{student_id}", response_model=list[ReadSemesterCourse]) 
-async def read_student_course_all(student_id:UUID):
-    response = SUPABASE.table("STUDENT_COURSE").select("*, COURSE(course_code,course_name, credit_hour, course_type, pre_requisite, course_semester, course_desc, course_department)").eq("student_id",student_id).execute()
-    if not response.data:
-        raise HTTPException(status_code=404, detail="Record not found")
-    return response.data
-
 #get list of course taken by each semester
 @router.get("/get/SemesterCourse/{student_id}/{semester}", response_model=list[ReadSemesterCourse])
 async def get_semester_course(student_id: UUID, semester: int):
@@ -64,6 +42,30 @@ async def get_academic_standing(student_id: UUID, semester: int):
             "status_label": "Probation" if is_probation else "Normal"
         }
     }
+
+@router.get("/get/{student_id}/{course_code}/{semester}", response_model=list[ReadSemesterCourse])
+async def read_student_course_specific(student_id: UUID, course_code: str, semester: int):
+    response = SUPABASE.table("STUDENT_COURSE")\
+        .select("*, COURSE(course_code,course_name, credit_hour, course_type,pre_requisite, course_semester, course_desc, course_department)")\
+        .eq("student_id", student_id)\
+        .eq("course_code", course_code)\
+        .eq("semester", semester)\
+        .execute() 
+        
+    if not response.data:
+        raise HTTPException(status_code=404, detail="Record not found")
+    return response.data
+
+
+#route to get all course student_course data
+@router.get("/get/{student_id}", response_model=list[ReadSemesterCourse]) 
+async def read_student_course_all(student_id:UUID):
+    response = SUPABASE.table("STUDENT_COURSE").select("*, COURSE(course_code,course_name, credit_hour, course_type, pre_requisite, course_semester, course_desc, course_department)").eq("student_id",student_id).execute()
+    if not response.data:
+        raise HTTPException(status_code=404, detail="Record not found")
+    return response.data
+
+
 #add new student_course based on pre-requisite
 @router.post("/add")
 async def add_student_course(course: StudentCourseAdd):
@@ -116,7 +118,7 @@ async def add_student_course(course: StudentCourseAdd):
             if not passed:
                 has_passed_all_prereqs = False
                 missing_prereqs.append(pre_code)
-                
+
     # 5. Insert Record
     if course.grade and course.grade.strip():
         course.status = "Completed"
