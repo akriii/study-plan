@@ -191,6 +191,7 @@ async def get_student_summary(student_id: UUID):
             "academic_meta": {
                 "is_probation": False,
                 "max_limit": 15,
+                "current_semester": "1",
                 "status_label": "Normal"
             }
         }

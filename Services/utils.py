@@ -2,6 +2,7 @@ from passlib.context import CryptContext
 from Database.database import SUPABASE
 from math import ceil
 from datetime import date, timedelta
+from uuid import UUID
 
 pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
 def HashPassword(password:str):
@@ -70,7 +71,7 @@ def Calc_Cgpa(completed_list: list):
     points, credits = calculate_points_and_credits(unique_latest_courses)
     return round(points / credits, 2) if credits > 0 else 0.00
 
-def Get_Probation_Status(student_id: str, target_semester: str):
+def Get_Probation_Status(student_id: UUID, target_semester: str):
     """
     Checks the GPA of the semester immediately preceding target_semester.
     Probation is only applied if the previous semester is FULLY COMPLETED with GPA < 2.00.
