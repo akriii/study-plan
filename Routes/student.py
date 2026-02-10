@@ -160,27 +160,33 @@ async def delete_student(student_id:UUID):
 @router.get("/graduate-on-time/{student_id}")
 async def get_student_got_status(student_id: UUID):
     # 1. Get Student Intake and Profile Info
-    student_query = SUPABASE.table("STUDENT")\
+    student_response = SUPABASE.table("STUDENT")\
         .select("intake_session")\
         .eq("student_id", student_id)\
         .maybe_single().execute()
     
-    if not student_query.data or not student_query.data.get("intake_session"):
-        raise HTTPException(status_code=404, detail="Intake session not found.")
+    # FIX: Check if student_response is None before accessing .data
+    if student_response is None or not student_response.data:
+        raise HTTPException(status_code=404, detail="Student profile not found.")
 
-    intake_date = date.fromisoformat(student_query.data["intake_session"])
+    intake_session = student_response.data.get("intake_session")
+    if not intake_session:
+        raise HTTPException(status_code=400, detail="Intake session date is missing in profile.")
 
-    # 2. Get All Course Records (Raw data for the helper to analyze)
-    all_courses = SUPABASE.table("STUDENT_COURSE")\
+    intake_date = date.fromisoformat(intake_session)
+
+    # 2. Get All Course Records
+    all_courses_res = SUPABASE.table("STUDENT_COURSE")\
         .select("course_code, semester, grade, status, COURSE(credit_hour)")\
         .eq("student_id", student_id).execute()
     
-    if not all_courses.data:
+    # FIX: Check if all_courses_res is None
+    if all_courses_res is None or not all_courses_res.data:
         return {"success": True, "analysis": "No course history found."}
 
-    # 3. Calculate Probation Count (Keep this logic in the route)
+    # 3. Calculate Probation Count
     semesters = {}
-    for c in all_courses.data:
+    for c in all_courses_res.data:
         sem = c['semester']
         if sem not in semesters: semesters[sem] = []
         semesters[sem].append(c)
@@ -188,14 +194,14 @@ async def get_student_got_status(student_id: UUID):
     probation_count = 0
     for sem_id, courses in semesters.items():
         if all(c.get("status") == "Completed" for c in courses):
+            # Using your existing Calc_Gpa utility
             if Calc_Gpa(courses) < 2.00:
                 probation_count += 1
 
-    # 4. THE FIX: Pass the raw list of courses into the analysis helper
-    # The helper now handles retakes and credit debt internally.
+    # 4. Perform Analysis
     analysis = calculate_got_details(
         intake_date=intake_date, 
-        all_student_courses=all_courses.data, # Changed this!
+        all_student_courses=all_courses_res.data, 
         probation_count=probation_count,
         total_degree_credits=164 
     )
