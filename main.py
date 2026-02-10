@@ -12,7 +12,8 @@ origins = [
     "http://localhost:8000", 
     "http://localhost:5173",
     "http://172.16.142.136",   
-    "http://172.16.142.4",             # The IP appearing in your logs
+    "http://172.16.142.4",  
+    "https://study-plan-react.vercel.app",           
     "*",
 ]
 #adding CORS middleware to handle cross-origin requests
