@@ -7,9 +7,10 @@ from uuid import UUID
 router = APIRouter()
 
 # Updated route to fetch courses where the department is in the jsonb list
+# Updated route to correctly query JSONB arrays
 @router.get("/get/department/{department_name}", response_model=list[CourseRead])
 async def read_courses_by_department(department_name: str):
-    # The 'cs' filter checks if the jsonb array contains the department_name
+    # The value must be a list to match the JSONB array structure
     response = SUPABASE.table("COURSE") \
         .select("*") \
         .contains("course_department", [department_name]) \
@@ -30,6 +31,7 @@ async def read_courses_by_department(department_name: str):
             course["pre_requisite"] = []
             
     return response.data
+
 async def get_courses(course_type: str):
     response = SUPABASE.table("COURSE").select("*").ilike("course_type", course_type.strip()).execute()
     if not response.data:
