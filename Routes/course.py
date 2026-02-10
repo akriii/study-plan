@@ -6,6 +6,41 @@ import json
 
 router = APIRouter()
 
+@router.get("/get/{student_id}")
+async def read_all_course(student_id: UUID):
+    student_query = SUPABASE.table("STUDENT") \
+        .select("student_department") \
+        .eq("student_id", student_id) \
+        .maybe_single() \
+        .execute()
+    
+    if not student_query.data or not student_query.data.get("student_department"):
+        raise HTTPException(
+            status_code=404, 
+            detail="Student department not found. Please set your department in your profile."
+        )
+    
+    dept_name = student_query.data["student_department"]
+
+    json_dept_query = json.dumps([dept_name])
+
+    response = SUPABASE.table("COURSE") \
+        .select("*") \
+        .contains("course_department", json_dept_query) \
+        .execute()
+
+    if not response.data:
+        raise HTTPException(
+            status_code=404, 
+            detail=f"No courses found for the {dept_name} department."
+        )
+    
+    # 3. Data Normalization
+    for course in response.data:
+        pre_req = course.get("pre_requisite")
+        course["pre_requisite"] = [pre_req] if isinstance(pre_req, str) else (pre_req or [])
+        
+    return response.data
 
 async def get_available_courses_by_type(student_id: UUID, course_type: str):
     # 1. Fetch Student's Department from the STUDENT table
