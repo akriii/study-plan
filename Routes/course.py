@@ -6,7 +6,7 @@ import json
 
 router = APIRouter()
 
-@router.get("/get/{student_id}")
+@router.get("/get/all/{student_id}")
 async def read_all_course(student_id: UUID):
     student_query = SUPABASE.table("STUDENT") \
         .select("student_department") \
@@ -41,64 +41,6 @@ async def read_all_course(student_id: UUID):
         course["pre_requisite"] = [pre_req] if isinstance(pre_req, str) else (pre_req or [])
         
     return response.data
-
-async def get_available_courses_by_type(student_id: UUID, course_type: str):
-    # 1. Fetch Student's Department from the STUDENT table
-    student_info = SUPABASE.table("STUDENT") \
-        .select("student_department") \
-        .eq("student_id", student_id) \
-        .maybe_single() \
-        .execute()
-    
-    if not student_info.data or not student_info.data.get("student_department"):
-        raise HTTPException(status_code=404, detail="Student department not found. Please update profile.")
-    
-    dept_name = student_info.data["student_department"]
-
-    # 2. Fetch Student History (To check prerequisites)
-    history_res = SUPABASE.table("STUDENT_COURSE") \
-        .select("course_code, status") \
-        .eq("student_id", student_id) \
-        .execute()
-    
-    planning_eligibility = {
-        record["course_code"] for record in history_res.data 
-        if record["status"] in ["Completed", "Current", "Planned"]
-    }
-
-    taken_or_planned = {
-        record["course_code"] for record in history_res.data 
-        if record["status"] in ["Current", "Completed", "Planned"]
-    }
-
-    # 3. Fetch Department-Specific Courses by Type
-    json_dept_query = json.dumps([dept_name])
-    
-    all_courses_res = SUPABASE.table("COURSE") \
-        .select("*") \
-        .eq("course_type", course_type) \
-        .contains("course_department", json_dept_query) \
-        .execute()
-    
-    if not all_courses_res.data:
-        return []
-
-    processed_courses = []
-    for course in all_courses_res.data:
-        code = course["course_code"]
-        if code in taken_or_planned:
-            continue
-            
-        # Prerequisite Logic
-        pre_reqs = course.get("pre_requisite")
-        cleaned_pre_reqs = [pre_reqs] if isinstance(pre_reqs, str) else (pre_reqs or [])
-        course["pre_requisite"] = cleaned_pre_reqs
-
-        # Lock/Unlock Logic
-        course["is_unlocked"] = not cleaned_pre_reqs or all(pre in planning_eligibility for pre in cleaned_pre_reqs)
-        processed_courses.append(course)
-
-    return processed_courses
 
 async def get_courses_by_student_context(student_id: UUID, course_type: str):
     """
