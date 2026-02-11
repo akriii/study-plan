@@ -120,68 +120,82 @@ def Get_Probation_Status(student_id: UUID, target_semester: str):
 
 
 
-def calculate_got_details(intake_date: date, all_student_courses: list, probation_count: int, total_degree_credits: int):
+def calculate_got_details(
+    intake_date: date, 
+    all_student_courses: list, 
+    probation_count: int, 
+    total_degree_credits: int,
+    defer_normal: int = 0,    # New Parameter
+    defer_medical: int = 0    # New Parameter
+):
     # 1. Constants and UTP Standards
     NORMAL_CAPACITY = 15
     PROBATION_CAPACITY = 11
-    TOTAL_SEMS = 12
-    INTERN_SEMS = 2
-    INTERN_CREDITS = 14  # 7 credits x 2 semesters
-    STUDY_SEMS = TOTAL_SEMS - INTERN_SEMS  # 10 study semesters
+    TOTAL_SEMS_BASE = 12
+    RESIDENCY_MAX_LIMIT = 21  # The "Hard Limit"
+    INTERN_CREDITS = 14
+    STUDY_SEMS = 10 
 
     # 2. Analyze Course History for Retakes
     history = {}
     for c in all_student_courses:
         code = c.get("course_code")
-        if code not in history: 
-            history[code] = []
-        history[code].append(c)
+        if code:
+            if code not in history: history[code] = []
+            history[code].append(c)
 
     total_failed_credits = 0
     completed_credits = 0
 
     for code, attempts in history.items():
-        # Sort by semester descending (latest first)
         attempts.sort(key=lambda x: int(x.get("semester", 0)), reverse=True)
         latest = attempts[0]
-        
-        # Check if they have EVER passed this subject
         has_passed = any(a.get("status") == "Completed" and a.get("grade") not in ["F", "Fail", None] for a in attempts)
         
-        credits = latest.get("COURSE", {}).get("credit_hour", 0)
+        course_info = latest.get("COURSE") or {}
+        credits = latest.get("credit_hour") or course_info.get("credit_hour", 0)
         
         if has_passed:
             completed_credits += credits
         elif latest.get("grade") == "F":
-            # Only count as debt if the latest attempt is still a fail
             total_failed_credits += credits
 
-    # 3. Track Timeline
+    # 3. Track Timeline & Account for Deferment
     today = date.today()
     start_month, start_year = intake_date.month, intake_date.year
     months_passed = (today.year - start_year) * 12 + (today.month - start_month)
-    sems_passed = min(TOTAL_SEMS, months_passed // 4)
+    
+    # Total semesters used so far includes actual study time plus all deferments
+    total_sems_passed = months_passed // 4
     
     # 4. Calculate 'Academic Work' Left
-    # Work left = (Core credits not yet passed) + (Unresolved failures)
     study_credits_needed = (total_degree_credits - INTERN_CREDITS - 
                             min(completed_credits, total_degree_credits - INTERN_CREDITS)) + total_failed_credits
 
     # 5. Calculate Capacity
-    remaining_study_sems = max(0, STUDY_SEMS - min(STUDY_SEMS, sems_passed))
-    # Every probation semester reduces capacity by 4 credits
+    # We only have 10 study semesters to work with.
+    remaining_study_sems = max(0, STUDY_SEMS - (total_sems_passed - defer_normal - defer_medical))
     probation_penalty = probation_count * (NORMAL_CAPACITY - PROBATION_CAPACITY)
     available_study_slots = (remaining_study_sems * NORMAL_CAPACITY) - probation_penalty
 
     # 6. Determine Extension
-    if study_credits_needed > available_study_slots:
-        overflow_credits = study_credits_needed - available_study_slots
-        extra_semesters = ceil(overflow_credits / NORMAL_CAPACITY)
-    else:
-        extra_semesters = 0
+    extra_semesters = ceil(max(0, study_credits_needed - available_study_slots) / NORMAL_CAPACITY)
 
-    # 7. Final Results
-    total_duration_sems = TOTAL_SEMS + extra_semesters
+    # 7. Residency Validation (The 21-Sem Rule)
+    # residency_count = Base(12) + academic_extensions + normal_deferment
+    # Medical deferment does NOT count toward this limit
+    total_residency_sems = TOTAL_SEMS_BASE + extra_semesters + defer_normal
+
+    if total_residency_sems > RESIDENCY_MAX_LIMIT:
+        return {
+            "is_valid_degree": False,
+            "message": f"Degree Invalid: Total semesters ({total_residency_sems}) exceeds the 21-semester limit due to excessive deferment/delays.",
+            "total_semesters": total_residency_sems
+        }
+
+    # 8. Final Results (Expected Grad Date)
+    # The actual date includes BOTH types of deferment
+    total_duration_sems = TOTAL_SEMS_BASE + extra_semesters + defer_normal + defer_medical
     total_months = total_duration_sems * 4
     
     end_total_months = start_month + total_months - 1
@@ -189,19 +203,18 @@ def calculate_got_details(intake_date: date, all_student_courses: list, probatio
     end_year = start_year + (end_total_months // 12)
     
     percentage = (months_passed / total_months) * 100 if total_months > 0 else 0
-    percentage = max(0, min(100, round(percentage, 2)))
-
     month_names = {1: "Jan", 5: "May", 9: "Sept"}
 
     return {
+        "is_valid_degree": True,
         "graduate_on_time_date": f"{month_names.get(end_month, 'Unknown')} {end_year}",
-        "progress_percentage": percentage,
-        "extra_semesters": extra_semesters,
-        "is_delayed": extra_semesters > 0,
+        "progress_percentage": max(0, min(100, round(percentage, 2))),
+        "extra_semesters_needed": extra_semesters,
+        "total_deferment_taken": defer_normal + defer_medical,
+        "residency_count": total_residency_sems,
         "meta": {
-            "study_credits_remaining": study_credits_needed,
-            "study_capacity_left": available_study_slots,
-            "unresolved_failed_credits": total_failed_credits,
-            "completed_study_credits": completed_credits
+            "deferment_normal": defer_normal,
+            "deferment_medical": defer_medical,
+            "study_credits_remaining": study_credits_needed
         }
     }

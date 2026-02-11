@@ -161,7 +161,7 @@ async def delete_student(student_id:UUID):
 async def get_student_got_status(student_id: UUID):
     # 1. Get Student Intake and Profile Info
     student_response = SUPABASE.table("STUDENT")\
-        .select("intake_session")\
+        .select("intake_session, deferment_normal, deferment_medical")\
         .eq("student_id", student_id)\
         .maybe_single().execute()
     
@@ -170,6 +170,9 @@ async def get_student_got_status(student_id: UUID):
         raise HTTPException(status_code=404, detail="Student profile not found.")
 
     intake_session = student_response.data.get("intake_session")
+    defer_n = student_response.data.get("deferment_normal") or 0
+    defer_m = student_response.data.get("deferment_medical") or 0
+
     if not intake_session:
         raise HTTPException(status_code=400, detail="Intake session date is missing in profile.")
 
@@ -203,7 +206,9 @@ async def get_student_got_status(student_id: UUID):
         intake_date=intake_date, 
         all_student_courses=all_courses_res.data, 
         probation_count=probation_count,
-        total_degree_credits=164 
+        total_degree_credits=164,
+        defer_normal=defer_n,
+        defer_medical=defer_m
     )
 
     return {"success": True, "analysis": analysis}

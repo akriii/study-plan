@@ -27,6 +27,8 @@ class StudentRead(BaseModel):
     student_GOT: Optional[date] = None
     intake_session: Optional[date] = None
     student_department: Optional[str] = None
+    deferment_normal: Optional[int] = 0
+    deferment_medical: Optional[int] = 0
     
 class AcademicMeta(BaseModel):
     is_probation: bool
@@ -56,6 +58,8 @@ class StudentUpdate(BaseModel):
     student_name: Optional[str] = None
     intake_session: Optional[Union[date, str]] = None
     student_department: Optional[str] = None
+    deferment_normal: Optional[int] = 0
+    deferment_medical: Optional[int] = 0
 
 class StudentRemove(BaseModel):
     student_id: UUID
@@ -65,6 +69,8 @@ class StudentRemove(BaseModel):
     student_image: Optional[str] = None
     student_GOT: Optional[date] = None
     student_department: Optional[str] = None
+    deferment_normal: Optional[int] = 0
+    deferment_medical: Optional[int] = 0
     
 class StudentCourseAdd(BaseModel):
     student_id: UUID
