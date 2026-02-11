@@ -183,10 +183,7 @@ async def get_student_got_status(student_id: UUID):
         .select("course_code, semester, grade, status, COURSE(credit_hour)")\
         .eq("student_id", student_id).execute()
     
-    # FIX: Check if all_courses_res is None
-    if all_courses_res is None or not all_courses_res.data:
-        return {"success": True, "analysis": "No course history found."}
-
+    
     # 3. Calculate Probation Count
     semesters = {}
     for c in all_courses_res.data:
