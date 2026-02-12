@@ -194,6 +194,21 @@ async def read_available_cc(student_id: UUID):
     return await get_available_courses_by_type(student_id, "CC")
 
 
+#get all courses by department
+@router.get("/get/all/CourseDepartment/{course_department}")
+async def read_all_course_by_department(course_department:str):
+    json_course_department = json.dumps([course_department.strip()])
+
+    response = SUPABASE.table("COURSE").select("*").contains("course_department", json_course_department).execute()
+
+    if not response.data:
+        raise HTTPException(status_code=404, detail=f"No courses found for department: {course_department}")
+    
+    for course in response.data:
+        pre_req = course.get("pre_requisite")
+        course["pre_requisite"] = [pre_req] if isinstance(pre_req, str) else (pre_req or [])
+    
+    return response.data
 
 @router.post("/upsert")
 async def upsert_course_to_department(course: CourseCreate, department: str):
