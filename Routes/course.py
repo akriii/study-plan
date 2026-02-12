@@ -213,10 +213,10 @@ async def read_all_course_by_department(course_department:str):
 @router.post("/upsert")
 async def upsert_course_to_department(course: CourseCreate, department: str):
     """
-    Adds a new course or links an existing course to a new department 
-    using the jsonb course_department list.
+    Updates course details and appends a new department to the jsonb list 
+    without overwriting existing departments.
     """
-    # 1. Check if the course already exists globally by its code
+    # 1. Check if the course already exists globally
     existing = SUPABASE.table("COURSE") \
         .select("course_department") \
         .eq("course_code", course.course_code) \
@@ -224,33 +224,38 @@ async def upsert_course_to_department(course: CourseCreate, department: str):
         .execute()
 
     if existing.data:
-        # COURSE EXISTS: We only need to update the department list
+        # COURSE EXISTS: Prepare the merged department list
         current_depts = existing.data.get("course_department")
         
-        # Normalize current_depts to a list if it's a string or None
+        # Normalize current_depts to a list
         if isinstance(current_depts, str):
             current_depts = [current_depts]
         elif current_depts is None:
             current_depts = []
             
+        # Add the new department if it's not already there
         if department not in current_depts:
             current_depts.append(department)
             
-            # Update only the department column
-            update_res = SUPABASE.table("COURSE") \
-                .update({"course_department": current_depts}) \
-                .eq("course_code", course.course_code) \
-                .execute()
-            
-            return {"message": f"Course linked to {department} successfully.", "data": update_res.data[0]}
+        # 2. Prepare the update payload
+        # We dump the new course details but override the department list with our merged one
+        update_data = course.model_dump()
+        update_data["course_department"] = current_depts
+
+        # 3. Execute the update
+        update_res = SUPABASE.table("COURSE") \
+            .update(update_data) \
+            .eq("course_code", course.course_code) \
+            .execute()
         
-        return {"message": "Course is already associated with this department."}
+        return {
+            "message": f"Course details updated and linked to {department}.", 
+            "data": update_res.data[0]
+        }
 
     else:
-        # COURSE IS NEW
+        # COURSE IS NEW: Insert with the initial department list
         new_course_data = course.model_dump()
-        
-        # Ensure course_department is a list containing the initial department
         new_course_data["course_department"] = [department]
         
         insert_res = SUPABASE.table("COURSE").insert(new_course_data).execute()
@@ -258,4 +263,7 @@ async def upsert_course_to_department(course: CourseCreate, department: str):
         if not insert_res.data:
             raise HTTPException(status_code=400, detail="Failed to create new course.")
             
-        return {"message": "New course created and assigned to department.", "data": insert_res.data[0]}
+        return {
+            "message": "New course created and assigned to department.", 
+            "data": insert_res.data[0]
+        }
