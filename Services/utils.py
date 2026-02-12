@@ -87,7 +87,7 @@ def Get_Probation_Status(student_id: UUID, target_semester: str):
     """
 
     target_sem_str = str(target_semester)
-    semester_order = ["1", "2", "3", "4", "5", "6", "7", "Student Industrial Internship Programme", "8", "9", "10"]
+    semester_order = ["1", "2", "3", "4", "5", "6", "7", "Student Industrial Internship Programme", "Student Industrial Internship Programme","8", "9", "10"]
 
     if target_sem_str not in semester_order or target_sem_str == semester_order[0]:
         return False, 15
