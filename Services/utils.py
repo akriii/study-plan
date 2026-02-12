@@ -82,41 +82,50 @@ def Calc_Cgpa(completed_list: list):
 
 def Get_Probation_Status(student_id: UUID, target_semester: str):
     """
-    Checks the GPA of the semester immediately preceding target_semester.
-    Probation is only applied if the previous semester is FULLY COMPLETED with GPA < 2.00.
+    Checks the GPA of the semester logically preceding target_semester.
+    Works for any department or semester naming convention.
     """
-
-    target_sem_str = str(target_semester)
-    semester_order = ["1", "2", "3", "4", "5", "6", "7", "Student Industrial Internship Programme", "Student Industrial Internship Programme","8", "9", "10"]
-
-    if target_sem_str not in semester_order or target_sem_str == semester_order[0]:
+    # 1. Fetch all unique semesters this student has records for
+    all_sems_query = SUPABASE.table("STUDENT_COURSE") \
+        .select("semester") \
+        .eq("student_id", student_id) \
+        .execute()
+    
+    if not all_sems_query.data:
         return False, 15
 
-    current_index = semester_order.index(target_sem_str)
-    prev_sem = semester_order[current_index - 1]
+    # 2. Create a sorted unique list of semesters
+    # We use a helper to ensure "Internship" comes after "7" but before "8"
+    def sem_sorter(sem):
+        try:
+            return float(sem) # Numeric sems (1, 2, 3...)
+        except ValueError:
+            return 7.5 # Place text-based internship between 7 and 8
 
-    # Fetch courses from the previous semester
+    unique_sems = sorted(list(set(str(r['semester']) for r in all_sems_query.data)), key=sem_sorter)
+
+    # 3. Identify the previous semester
+    target_sem_str = str(target_semester)
+    if target_sem_str not in unique_sems or target_sem_str == unique_sems[0]:
+        return False, 15
+
+    current_index = unique_sems.index(target_sem_str)
+    prev_sem = unique_sems[current_index - 1]
+
+    # 4. Fetch and Calculate GPA for that specific previous semester
+    # NOTE: Use .eq("semester", prev_sem) directly if the DB column is text. 
+    # If DB is smallint, use int(prev_sem) inside a try/except.
     response = SUPABASE.table("STUDENT_COURSE") \
         .select("*, COURSE(credit_hour)") \
         .eq("student_id", student_id) \
         .eq("semester", prev_sem) \
         .execute()
 
-    if not response.data:
-        return False, 15 
-
-    # If any course in the previous semester is NOT 'Completed', we don't apply probation yet.
-    is_prev_sem_finalized = all(record.get("status") == "Completed" for record in response.data)
-
-    if not is_prev_sem_finalized:
+    if not response.data or not all(r.get("status") == "Completed" for r in response.data):
         return False, 15
 
     gpa = Calc_Gpa(response.data)
-    
-    if gpa < 2.00:
-        return True, 11  
-    
-    return False, 15   
+    return (True, 11) if gpa < 2.00 else (False, 15)
 
 
 
