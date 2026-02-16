@@ -47,7 +47,7 @@ async def get__advisor(student_id: UUID):
         )
 
         response = client.chat.completions.create(
-            model="Qwen/Qwen2.5-7B-Instruct", 
+            model="meta-llama/Llama-3.1-8B-Instruct", 
             messages=[
                 {"role": "system", "content": system_instruction},
                 {"role": "user", "content": f"Student Transcript Data:\n{transcript_summary}"}
