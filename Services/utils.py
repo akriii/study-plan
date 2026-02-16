@@ -3,6 +3,35 @@ from Database.database import SUPABASE
 from math import ceil
 from datetime import date, timedelta
 from uuid import UUID
+import os
+import secrets
+from fastapi import APIRouter, Depends, HTTPException, status
+from fastapi.security import HTTPBasic, HTTPBasicCredentials
+
+router = APIRouter()
+security = HTTPBasic()
+
+def authenticate_admin(credentials: HTTPBasicCredentials = Depends(security)):
+    """
+    Checks the pop-up credentials against the Master Admin info.
+   
+    """
+    # 1. Fetch the master admin info from Render Env
+    correct_username = os.getenv("ADMIN_USER")
+    correct_password = os.getenv("ADMIN_PASS")
+
+    # 2. Securely compare the strings to prevent 'timing attacks'
+    is_user_ok = secrets.compare_digest(credentials.username, str(correct_username))
+    is_pass_ok = secrets.compare_digest(credentials.password, str(correct_password))
+
+    if not (is_user_ok and is_pass_ok):
+        # 3. This specific error + header triggers the browser pop-up
+        raise HTTPException(
+            status_code=status.HTTP_401_UNAUTHORIZED,
+            detail="Unauthorized Access",
+            headers={"WWW-Authenticate": "Basic"},
+        )
+    return credentials.username
 
 pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
 def HashPassword(password:str):
@@ -225,3 +254,4 @@ def calculate_got_details(
             "failed_credits": total_failed_credits
         }
     }
+

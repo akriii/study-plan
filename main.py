@@ -2,9 +2,13 @@ from fastapi import FastAPI, HTTPException
 from Database.database import SUPABASE
 from Routes import student,course, student_course, advisor, report
 from fastapi.middleware.cors import CORSMiddleware
-
+from slowapi import _rate_limit_exceeded_handler
+from slowapi.errors import RateLimitExceeded
+from Routes.advisor import limiter  
 app = FastAPI()
 
+app.state.limiter = limiter
+app.add_exception_handler(RateLimitExceeded, _rate_limit_exceeded_handler)
 #define origins that are allowed to make requests to this backend
 origins = [
     "http://localhost:3000",  

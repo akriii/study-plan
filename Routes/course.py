@@ -1,6 +1,7 @@
-from fastapi import FastAPI,APIRouter, HTTPException
+from fastapi import FastAPI,APIRouter, HTTPException, Depends
 from Database.database import SUPABASE
 from Model.models import  CourseRead, CourseCreate
+from Services.utils import authenticate_admin
 from uuid import UUID
 import json 
 
@@ -211,7 +212,7 @@ async def read_all_course_by_department(course_department:str):
     return response.data
 
 @router.post("/upsert")
-async def upsert_course_to_department(course: CourseCreate, department: str):
+async def upsert_course_to_department(course: CourseCreate, department: str, username: str = Depends(authenticate_admin)):
     """
     Updates course details and appends a new department to the jsonb list 
     without overwriting existing departments.
@@ -222,8 +223,8 @@ async def upsert_course_to_department(course: CourseCreate, department: str):
         .eq("course_code", course.course_code) \
         .maybe_single() \
         .execute()
-
-    if existing.data:
+    
+    if existing and existing.data:
         # COURSE EXISTS: Prepare the merged department list
         current_depts = existing.data.get("course_department")
         
