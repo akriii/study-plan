@@ -1,472 +1,1422 @@
 [
-{
+  {
     "course_code": "VFB4073",
     "course_name": "Final Year Project 1",
     "credit_hour": 2.0,
     "pre_requisite": ["IFB3037","IFB3047"],
-    "course_type": "CD"
-},
-{
+    "course_type": "CD",
+    "course_semester": 9,
+    "course_desc": null,
+    "course_department": ["CEE"]
+  },
+  {
     "course_code": "VFB4094",
     "course_name": "Final Year Project 2",
     "credit_hour": 4.0,
     "pre_requisite": ["VFB4073"],
-    "course_type": "CD"
-},
-{
+    "course_type": "CD",
+    "course_semester": 10,
+    "course_desc": null,
+    "course_department": ["CEE"]
+  },
+  {
     "course_code": "VFB4042",
     "course_name": "Civil Engineering Design 1",
     "credit_hour": 2.0,
     "pre_requisite": ["IFB3037","IFB3047"],
-    "course_type": "CD"
-},
-{
+    "course_type": "CD",
+    "course_semester": 8,
+    "course_desc": null,
+    "course_department": ["CEE"]
+  },
+  {
     "course_code": "VFB4063",
     "course_name": "Civil Engineering Design 2",
     "credit_hour": 3.0,
     "pre_requisite": ["VFB4042"],
-    "course_type": "CD"
-},
-{
+    "course_type": "CD",
+    "course_semester": 9,
+    "course_desc": null,
+    "course_department": ["CEE"]
+  },
+  {
     "course_code": "VFB4013",
     "course_name": "Construction Project Management",
     "credit_hour": 3.0,
     "pre_requisite": [],
-    "course_type": "CD"
-},
-{
+    "course_type": "CD",
+    "course_semester": 8,
+    "course_desc": null,
+    "course_department": ["CEE"]
+  },
+  {
     "course_code": "VFB4022",
     "course_name": "Design of Reinforced Concrete Structures 2",
     "credit_hour": 2.0,
     "pre_requisite": ["VFB2033"],
-    "course_type": "CD"
-},
-{
+    "course_type": "CD",
+    "course_semester": 8,
+    "course_desc": null,
+    "course_department": ["CEE"]
+  },
+  {
     "course_code": "VFB4032",
     "course_name": "Building Information Modelling",
     "credit_hour": 2.0,
     "pre_requisite": [],
-    "course_type": "CD"
-},
-{
+    "course_type": "CD",
+    "course_semester": 8,
+    "course_desc": null,
+    "course_department": ["CEE"]
+  },
+  {
     "course_code": "VFB4082",
     "course_name": "Computational Methods for Civil Engineers",
     "credit_hour": 2.0,
     "pre_requisite": [],
-    "course_type": "CD"
-},
-{
+    "course_type": "CD",
+    "course_semester": 9,
+    "course_desc": null,
+    "course_department": ["CEE"]
+  },
+  {
     "course_code": "VFB4052",
     "course_name": "Design of Earth Retaining Structure",
     "credit_hour": 2.0,
     "pre_requisite": ["VFB3042"],
-    "course_type": "CD"
-},
-{
+    "course_type": "CD",
+    "course_semester": 8,
+    "course_desc": null,
+    "course_department": ["CEE"]
+  },
+  {
     "course_code": "VFB2102",
     "course_name": "Water Supply Engineering",
     "credit_hour": 2.0,
     "pre_requisite": [],
-    "course_type": "CD"
-},
-{
+    "course_type": "CD",
+    "course_semester": 6,
+    "course_desc": null,
+    "course_department": ["CEE"]
+  },
+  {
     "course_code": "VFB3012",
     "course_name": "Civil Engineering Laboratory 3",
     "credit_hour": 2.0,
     "pre_requisite": ["VFB2073"],
-    "course_type": "CD"
-},
-{
+    "course_type": "CD",
+    "course_semester": 7,
+    "course_desc": null,
+    "course_department": ["CEE"]
+  },
+  {
     "course_code": "VFB3022",
     "course_name": "Design of Reinforced Concrete Structures 1",
     "credit_hour": 2.0,
     "pre_requisite": ["VFB2033"],
-    "course_type": "CD"
-},
-{
+    "course_type": "CD",
+    "course_semester": 7,
+    "course_desc": null,
+    "course_department": ["CEE"]
+  },
+  {
     "course_code": "VFB3033",
     "course_name": "Wastewater Engineering",
     "credit_hour": 3.0,
     "pre_requisite": [],
-    "course_type": "CD"
-},
-{
+    "course_type": "CD",
+    "course_semester": 7,
+    "course_desc": null,
+    "course_department": ["CEE"]
+  },
+  {
     "course_code": "VFB3042",
     "course_name": "Design of Foundation",
     "credit_hour": 2.0,
     "pre_requisite": ["VFB2023"],
-    "course_type": "CD"
-},
-{
+    "course_type": "CD",
+    "course_semester": 7,
+    "course_desc": null,
+    "course_department": ["CEE"]
+  },
+  {
     "course_code": "VFB2052",
     "course_name": "Civil Engineering Laboratory 1",
     "credit_hour": 2.0,
     "pre_requisite": ["VFB2012","VFB2023","VFB1063"],
-    "course_type": "CD"
-},
-{
+    "course_type": "CD",
+    "course_semester": 5,
+    "course_desc": null,
+    "course_department": ["CEE"]
+  },
+  {
     "course_code": "VFB2063",
     "course_name": "Hydrology",
     "credit_hour": 3.0,
     "pre_requisite": ["FFM1063"],
-    "course_type": "CD"
-},
-
-{
+    "course_type": "CD",
+    "course_semester": 5,
+    "course_desc": null,
+    "course_department": ["CEE"]
+  },
+  {
     "course_code": "VFB2073",
     "course_name": "Highway Engineering",
     "credit_hour": 3.0,
     "pre_requisite": [],
-    "course_type": "CD"
-},
-{
+    "course_type": "CD",
+    "course_semester": 6,
+    "course_desc": null,
+    "course_department": ["CEE"]
+  },
+  {
     "course_code": "VFB2082",
     "course_name": "Design of Steel Structures",
     "credit_hour": 2.0,
     "pre_requisite": ["VFB2033"],
-    "course_type": "CD"
-},
-{
+    "course_type": "CD",
+    "course_semester": 6,
+    "course_desc": null,
+    "course_department": ["CEE"]
+  },
+  {
     "course_code": "VFB2092",
     "course_name": "Civil Engineering Laboratory 2",
     "credit_hour": 2.0,
     "pre_requisite": ["VFB1052","VFB2043","VFB2063"],
-    "course_type": "CD"
-},
-{
+    "course_type": "CD",
+    "course_semester": 6,
+    "course_desc": null,
+    "course_department": ["CEE"]
+  },
+  {
     "course_code": "VFB1063",
     "course_name": "Theory of Structures",
     "credit_hour": 3.0,
     "pre_requisite": ["VFB1033"],
-    "course_type": "CD"
-},
-{
+    "course_type": "CD",
+    "course_semester": 3,
+    "course_desc": null,
+    "course_department": ["CEE"]
+  },
+  {
     "course_code": "VFB1072",
     "course_name": "Traffic Engineering",
     "credit_hour": 2.0,
     "pre_requisite": [],
-    "course_type": "CD"
-},
-{
+    "course_type": "CD",
+    "course_semester": 3,
+    "course_desc": null,
+    "course_department": ["CEE"]
+  },
+  {
     "course_code": "VFB2012",
     "course_name": "Sustainable Concrete Technology",
     "credit_hour": 2.0,
     "pre_requisite": [],
-    "course_type": "CD"
-},
-{
+    "course_type": "CD",
+    "course_semester": 4,
+    "course_desc": null,
+    "course_department": ["CEE"]
+  },
+  {
     "course_code": "VFB2023",
     "course_name": "Soil Mechanics",
     "credit_hour": 3.0,
     "pre_requisite": ["VFB1033"],
-    "course_type": "CD"
-},
-{
+    "course_type": "CD",
+    "course_semester": 4,
+    "course_desc": null,
+    "course_department": ["CEE"]
+  },
+  {
     "course_code": "VFB2033",
     "course_name": "Structural Analysis",
     "credit_hour": 3.0,
     "pre_requisite": ["VFB1063"],
-    "course_type": "CD"
-},
-{
+    "course_type": "CD",
+    "course_semester": 4,
+    "course_desc": null,
+    "course_department": ["CEE"]
+  },
+  {
     "course_code": "VFB2043",
     "course_name": "Hydraulics",
     "credit_hour": 3.0,
     "pre_requisite": ["VFB1052"],
-    "course_type": "CD"
-},
-{
+    "course_type": "CD",
+    "course_semester": 4,
+    "course_desc": null,
+    "course_department": ["CEE"]
+  },
+  {
     "course_code": "VFB1012",
     "course_name": "Civil Engineering Drawing",
     "credit_hour": 2.0,
     "pre_requisite": [],
-    "course_type": "CD"
-},
-{
+    "course_type": "CD",
+    "course_semester": 1,
+    "course_desc": null,
+    "course_department": ["CEE"]
+  },
+  {
     "course_code": "VFB1023",
     "course_name": "Engineering Mechanics",
     "credit_hour": 3.0,
     "pre_requisite": [],
-    "course_type": "CD"
-},
-{
+    "course_type": "CD",
+    "course_semester": 1,
+    "course_desc": null,
+    "course_department": ["CEE"]
+  },
+  {
     "course_code": "VFB1033",
     "course_name": "Mechanics of Solids",
     "credit_hour": 3.0,
     "pre_requisite": ["VFB1023"],
-    "course_type": "CD"
-},
-{
+    "course_type": "CD",
+    "course_semester": 2,
+    "course_desc": null,
+    "course_department": ["CEE"]
+  },
+  {
     "course_code": "VFB1043",
     "course_name": "Geomatics",
     "credit_hour": 3.0,
     "pre_requisite": [],
-    "course_type": "CD"
-},
-{
+    "course_type": "CD",
+    "course_semester": 2,
+    "course_desc": null,
+    "course_department": ["CEE"]
+  },
+  {
     "course_code": "VFB1052",
     "course_name": "Civil Engineering Fluid Mechanics",
     "credit_hour": 2.0,
     "pre_requisite": ["VFB1023"],
-    "course_type": "CD"
-},
-{
+    "course_type": "CD",
+    "course_semester": 3,
+    "course_desc": null,
+    "course_department": ["CEE"]
+  },
+  {
     "course_code": "MFB4123",
     "course_name": "Energy Management & Environment",
     "credit_hour": 3.0,
     "pre_requisite": [],
-    "course_type": "CSp"
-},
-{
+    "course_type": "CSp",
+    "course_semester": null,
+    "course_desc": null,
+    "course_department": ["CEE"]
+  },
+  {
     "course_code": "MFB4513",
     "course_name": "Renewable Energy 1",
     "credit_hour": 3.0,
     "pre_requisite": [],
-    "course_type": "CSp"
-},
-{
+    "course_type": "CSp",
+    "course_semester": null,
+    "course_desc": null,
+    "course_department": ["CEE"]
+  },
+  {
     "course_code": "MFB4523",
     "course_name": "Renewable Energy 2",
     "credit_hour": 3.0,
     "pre_requisite": [],
-    "course_type": "CSp"
-},
-{
+    "course_type": "CSp",
+    "course_semester": null,
+    "course_desc": null,
+    "course_department": ["CEE"]
+  },
+  {
     "course_code": "VFB4233",
     "course_name": "Air Pollution Prevention and Control",
     "credit_hour": 3.0,
     "pre_requisite": ["IFB3037","IFB3047"],
-    "course_type": "CSp"
-},
-{
+    "course_type": "CSp",
+    "course_semester": null,
+    "course_desc": null,
+    "course_department": ["CEE"]
+  },
+  {
     "course_code": "VFB4413",
     "course_name": "Construction Materials ans Sustainability",
     "credit_hour": 3.0,
     "pre_requisite": ["IFB3037","IFB3047"],
-    "course_type": "CSp"
-},
-{
+    "course_type": "CSp",
+    "course_semester": null,
+    "course_desc": null,
+    "course_department": ["CEE"]
+  },
+  {
     "course_code": "VFB4423",
     "course_name": "Low Carbon Building Design and Construction",
     "credit_hour": 3.0,
     "pre_requisite": ["IFB3037","IFB3047"],
-    "course_type": "CSp"
-},
-{
+    "course_type": "CSp",
+    "course_semester": null,
+    "course_desc": null,
+    "course_department": ["CEE"]
+  },
+  {
     "course_code": "VFB4433",
     "course_name": "Sustainable Transport Infrastructure Engineering",
     "credit_hour": 3.0,
     "pre_requisite": ["IFB3037","IFB3047"],
-    "course_type": "CSp"
-},
-{
+    "course_type": "CSp",
+    "course_semester": null,
+    "course_desc": null,
+    "course_department": ["CEE"]
+  },
+  {
     "course_code": "VFB4113",
     "course_name": "Fixed Offshore Structures",
     "credit_hour": 3.0,
     "pre_requisite": ["IFB3037","IFB3047","VFB2033"],
-    "course_type": "CSp"
-},
-{
+    "course_type": "CSp",
+    "course_semester": null,
+    "course_desc": null,
+    "course_department": ["CEE"]
+  },
+  {
     "course_code": "VFB4133",
     "course_name": "Offshore Project Management",
     "credit_hour": 3.0,
     "pre_requisite": ["IFB3037","IFB3047"],
-    "course_type": "CSp"
-},
-{
+    "course_type": "CSp",
+    "course_semester": null,
+    "course_desc": null,
+    "course_department": ["CEE"]
+  },
+  {
     "course_code": "VFB4123",
     "course_name": "Wave Hydrodynamics",
     "credit_hour": 3.0,
     "pre_requisite": ["IFB3037","IFB3047"],
-    "course_type": "CSp"
-},
-{
+    "course_type": "CSp",
+    "course_semester": null,
+    "course_desc": null,
+    "course_department": ["CEE"]
+  },
+  {
     "course_code": "VFB4213",
     "course_name": "Sludge Management and Disposal",
     "credit_hour": 3.0,
     "pre_requisite": ["IFB3037","IFB3047"],
-    "course_type": "CSp"
-},
-{
+    "course_type": "CSp",
+    "course_semester": null,
+    "course_desc": null,
+    "course_department": ["CEE"]
+  },
+  {
     "course_code": "VFB4223",
     "course_name": "Advanced Physical - Chemical Treatment Technologies",
     "credit_hour": 3.0,
     "pre_requisite": ["IFB3037","IFB3047"],
-    "course_type": "CSp"
-},
-{
+    "course_type": "CSp",
+    "course_semester": null,
+    "course_desc": null,
+    "course_department": ["CEE"]
+  },
+  {
     "course_code": "MPU3182",
     "course_name": "Penghayatan Etika & Peradaban",
     "credit_hour": 2.0,
     "pre_requisite": [],
-    "course_type": "NR"
-},
-{
+    "course_type": "NR",
+    "course_semester": 1,
+    "course_desc": null,
+    "course_department": ["CEE"]
+  },
+  {
     "course_code": "MPU3142",
     "course_name": "BM Komunikasi 2 (International)",
     "credit_hour": 2.0,
     "pre_requisite": [],
-    "course_type": "NR"
-},
-{
+    "course_type": "NR",
+    "course_semester": 1,
+    "course_desc": null,
+    "course_department": ["CEE"]
+  },
+  {
     "course_code": "PFB1012",
     "course_name": "Introduction to Oil & Gas Industry and Sustainable Development",
     "credit_hour": 2.0,
     "pre_requisite": [],
-    "course_type": "UR"
-},
-{
+    "course_type": "UR",
+    "course_semester": 1,
+    "course_desc": null,
+    "course_department": ["CEE"]
+  },
+  {
     "course_code": "HFB2152",
     "course_name": "Ethics and Integrity",
     "credit_hour": 2.0,
     "pre_requisite": [],
-    "course_type": "UR"
-},
-{
+    "course_type": "UR",
+    "course_semester": 1,
+    "course_desc": null,
+    "course_department": ["CEE"]
+  },
+  {
     "course_code": "FFM1013",
     "course_name": "Engineering Mathematics 1",
     "credit_hour": 3.0,
     "pre_requisite": [],
-    "course_type": "CC"
-},
-{
+    "course_type": "CC",
+    "course_semester": 1,
+    "course_desc": null,
+    "course_department": ["CEE"]
+  },
+  {
     "course_code": "FFM1063",
     "course_name": "Statistics and Application",
     "credit_hour": 3.0,
     "pre_requisite": [],
-    "course_type": "CC"
-},
-{
+    "course_type": "CC",
+    "course_semester": 3,
+    "course_desc": null,
+    "course_department": ["CEE"]
+  },
+  {
     "course_code": "MPU3192",
     "course_name": "Falsafah & Isu Semasa (FIS)",
     "credit_hour": 2.0,
     "pre_requisite": [],
-    "course_type": "NR"
-},
-{
+    "course_type": "NR",
+    "course_semester": 2,
+    "course_desc": null,
+    "course_department": ["CEE"]
+  },
+  {
     "course_code": "FFM1023",
     "course_name": "Engineering Mathematics 2",
     "credit_hour": 3.0,
     "pre_requisite": [],
-    "course_type": "CC"
-},
-{
+    "course_type": "CC",
+    "course_semester": 2,
+    "course_desc": null,
+    "course_department": ["CEE"]
+  },
+  {
     "course_code": "CFB1032",
     "course_name": "Health, Safety & Environment",
     "credit_hour": 2.0,
     "pre_requisite": [],
-    "course_type": "CC"
-},
-{
+    "course_type": "CC",
+    "course_semester": 2,
+    "course_desc": null,
+    "course_department": ["CEE"]
+  },
+  {
     "course_code": "Co Curriculum 1",
     "course_name": "Co Curriculum 1",
     "credit_hour": 1.0,
     "pre_requisite": [],
-    "course_type": "UR"
-},
-{
+    "course_type": "UR",
+    "course_semester": 2,
+    "course_desc": null,
+    "course_department": ["CEE"]
+  },
+  {
     "course_code": "LFB1042",
     "course_name": "Academic Writing",
     "credit_hour": 2.0,
     "pre_requisite": [],
-    "course_type": "UR"
-},
-{
+    "course_type": "UR",
+    "course_semester": 3,
+    "course_desc": null,
+    "course_department": ["CEE"]
+  },
+  {
     "course_code": "HFB1022",
     "course_name": "Scientific Inquiry",
     "credit_hour": 2.0,
     "pre_requisite": [],
-    "course_type": "UR"
-},
-{
+    "course_type": "UR",
+    "course_semester": 3,
+    "course_desc": null,
+    "course_department": ["CEE"]
+  },
+  {
     "course_code": "HFB2033",
     "course_name": "Professional Communication Skills Course",
     "credit_hour": 3.0,
     "pre_requisite": [],
-    "course_type": "UR"
-},
-{
+    "course_type": "UR",
+    "course_semester": 4,
+    "course_desc": null,
+    "course_department": ["CEE"]
+  },
+  {
     "course_code": "MPU2",
     "course_name": "MPU2 Course",
     "credit_hour": 2.0,
     "pre_requisite": [],
-    "course_type": "NR"
-},
-{
+    "course_type": "NR",
+    "course_semester": 5,
+    "course_desc": null,
+    "course_department": ["CEE"]
+  },
+  {
     "course_code": "FFM2063",
     "course_name": "Data Analytics",
     "credit_hour": 3.0,
     "pre_requisite": [],
-    "course_type": "CC"
-},
-{
+    "course_type": "CC",
+    "course_semester": 5,
+    "course_desc": null,
+    "course_department": ["CEE"]
+  },
+  {
     "course_code": "GFB2102",
     "course_name": "Entrepreneurship",
     "credit_hour": 2.0,
     "pre_requisite": [],
-    "course_type": "UR"
-},
-{
+    "course_type": "UR",
+    "course_semester": 5,
+    "course_desc": null,
+    "course_department": ["CEE"]
+  },
+  {
     "course_code": "MFB2061",
     "course_name": "Engineering Team Project 1",
     "credit_hour": 1.0,
     "pre_requisite": [],
-    "course_type": "CC"
-},
-{
+    "course_type": "CC",
+    "course_semester": 5,
+    "course_desc": null,
+    "course_department": ["CEE"]
+  },
+  {
     "course_code": "MPU4",
     "course_name": "Community Engagement Project",
     "credit_hour": 2.0,
     "pre_requisite": [],
-    "course_type": "NR"
-},
-{
+    "course_type": "NR",
+    "course_semester": 6,
+    "course_desc": null,
+    "course_department": ["CEE"]
+  },
+  {
     "course_code": "MFB2062",
     "course_name": "Engineering Team Project 2",
     "credit_hour": 2.0,
     "pre_requisite": [],
-    "course_type": "CC"
-},
-{
+    "course_type": "CC",
+    "course_semester": 6,
+    "course_desc": null,
+    "course_department": ["CEE"]
+  },
+  {
     "course_code": "MPU3",
     "course_name": "MPU3 Courses",
     "credit_hour": 2.0,
     "pre_requisite": [],
-    "course_type": "NR"
-},
-{
+    "course_type": "NR",
+    "course_semester": 7,
+    "course_desc": null,
+    "course_department": ["CEE"]
+  },
+  {
     "course_code": "Co Curriculum 2",
     "course_name": "Co Curriculum 2",
     "credit_hour": 1.0,
     "pre_requisite": [],
-    "course_type": "UR"
-},
-{
+    "course_type": "UR",
+    "course_semester": 7,
+    "course_desc": null,
+    "course_department": ["CEE"]
+  },
+  {
     "course_code": "IFB3037",
     "course_name": "Student Industrial Training (SIT)",
     "credit_hour": 7.0,
     "pre_requisite": [],
-    "course_type": "CI"
-},
-{
+    "course_type": "CI",
+    "course_semester": null,
+    "course_desc": null,
+    "course_department": ["CEE"]
+  },
+  {
     "course_code": "IFB3047",
     "course_name": "Student Industrial Project (SIP)",
     "credit_hour": 7.0,
     "pre_requisite": [],
-    "course_type": "CI"
-},
-{
+    "course_type": "CI",
+    "course_semester": null,
+    "course_desc": null,
+    "course_department": ["CEE"]
+  },
+  {
     "course_code": "PFB4102",
     "course_name": "Engineering Economics",
     "credit_hour": 2.0,
     "pre_requisite": [],
-    "course_type": "CC"
-},
-{
+    "course_type": "CC",
+    "course_semester": 9,
+    "course_desc": null,
+    "course_department": ["CEE"]
+  },
+  {
     "course_code": "EFB4073",
     "course_name": "Engineers in Society",
     "credit_hour": 3.0,
     "pre_requisite": [],
-    "course_type": "CC"
-}
+    "course_type": "CC",
+    "course_semester": 10,
+    "course_desc": null,
+    "course_department": ["CEE"]
+  },
+  {
+    "course_code": "KFL101F",
+    "course_name": "Event Management",
+    "credit_hour": 1.0,
+    "pre_requisite": [],
+    "course_type": "UR",
+    "course_semester": null,
+    "course_desc": null,
+    "course_department": ["CEE"]
+  },
+  {
+    "course_code": "KFL102F",
+    "course_name": "Groom-Me",
+    "credit_hour": 1.0,
+    "pre_requisite": [],
+    "course_type": "UR",
+    "course_semester": null,
+    "course_desc": null,
+    "course_department": ["CEE"]
+  },
+  {
+    "course_code": "KFL103F",
+    "course_name": "Safety & Risk Management",
+    "credit_hour": 1.0,
+    "pre_requisite": [],
+    "course_type": "UR",
+    "course_semester": null,
+    "course_desc": null,
+    "course_department": ["CEE"]
+  },
+  {
+    "course_code": "KFL104F",
+    "course_name": "Wellbeing & Resilience",
+    "credit_hour": 1.0,
+    "pre_requisite": [],
+    "course_type": "UR",
+    "course_semester": null,
+    "course_desc": null,
+    "course_department": ["CEE"]
+  },
+  {
+    "course_code": "KFL105F",
+    "course_name": "Global Citizen",
+    "credit_hour": 1.0,
+    "pre_requisite": [],
+    "course_type": "UR",
+    "course_semester": null,
+    "course_desc": null,
+    "course_department": ["CEE"]
+  },
+  {
+    "course_code": "KFL106F",
+    "course_name": "Territorial Army 101",
+    "credit_hour": 1.0,
+    "pre_requisite": [],
+    "course_type": "UR",
+    "course_semester": null,
+    "course_desc": null,
+    "course_department": ["CEE"]
+  },
+  {
+    "course_code": "KFL107F",
+    "course_name": "Speaking Out Loud",
+    "credit_hour": 1.0,
+    "pre_requisite": [],
+    "course_type": "UR",
+    "course_semester": null,
+    "course_desc": null,
+    "course_department": ["CEE"]
+  },
+  {
+    "course_code": "KFL108F",
+    "course_name": "The Press",
+    "credit_hour": 1.0,
+    "pre_requisite": [],
+    "course_type": "UR",
+    "course_semester": null,
+    "course_desc": null,
+    "course_department": ["CEE"]
+  },
+  {
+    "course_code": "KFL109F",
+    "course_name": "Content Creator",
+    "credit_hour": 1.0,
+    "pre_requisite": [],
+    "course_type": "UR",
+    "course_semester": null,
+    "course_desc": null,
+    "course_department": ["CEE"]
+  },
+  {
+    "course_code": "KFL110F",
+    "course_name": "Effective Influencer",
+    "credit_hour": 1.0,
+    "pre_requisite": [],
+    "course_type": "UR",
+    "course_semester": null,
+    "course_desc": null,
+    "course_department": ["CEE"]
+  },
+  {
+    "course_code": "KFC101F",
+    "course_name": "Creative Animation",
+    "credit_hour": 1.0,
+    "pre_requisite": [],
+    "course_type": "UR",
+    "course_semester": null,
+    "course_desc": null,
+    "course_department": ["CEE"]
+  },
+  {
+    "course_code": "KFC102F",
+    "course_name": "Snap a Shot!",
+    "credit_hour": 1.0,
+    "pre_requisite": [],
+    "course_type": "UR",
+    "course_semester": null,
+    "course_desc": null,
+    "course_department": ["CEE"]
+  },
+  {
+    "course_code": "KFC103F",
+    "course_name": "Interior Design",
+    "credit_hour": 1.0,
+    "pre_requisite": [],
+    "course_type": "UR",
+    "course_semester": null,
+    "course_desc": null,
+    "course_department": ["CEE"]
+  },
+  {
+    "course_code": "KFC104F",
+    "course_name": "3D Prototyping",
+    "credit_hour": 1.0,
+    "pre_requisite": [],
+    "course_type": "UR",
+    "course_semester": null,
+    "course_desc": null,
+    "course_department": ["CEE"]
+  },
+  {
+    "course_code": "KFC105F",
+    "course_name": "3D Prototyping",
+    "credit_hour": 1.0,
+    "pre_requisite": [],
+    "course_type": "UR",
+    "course_semester": null,
+    "course_desc": null,
+    "course_department": ["CEE"]
+  },
+  {
+    "course_code": "KFC106F",
+    "course_name": "The Inventors",
+    "credit_hour": 1.0,
+    "pre_requisite": [],
+    "course_type": "UR",
+    "course_semester": null,
+    "course_desc": null,
+    "course_department": ["CEE"]
+  },
+  {
+    "course_code": "KFC107F",
+    "course_name": "Digital-preneur",
+    "credit_hour": 1.0,
+    "pre_requisite": [],
+    "course_type": "UR",
+    "course_semester": null,
+    "course_desc": null,
+    "course_department": ["CEE"]
+  },
+  {
+    "course_code": "KFC108F",
+    "course_name": "E-marketing",
+    "credit_hour": 1.0,
+    "pre_requisite": [],
+    "course_type": "UR",
+    "course_semester": null,
+    "course_desc": null,
+    "course_department": ["CEE"]
+  },
+  {
+    "course_code": "KFC109F",
+    "course_name": "FinTech",
+    "credit_hour": 1.0,
+    "pre_requisite": [],
+    "course_type": "UR",
+    "course_semester": null,
+    "course_desc": null,
+    "course_department": ["CEE"]
+  },
+  {
+    "course_code": "KFC110F",
+    "course_name": "Investment",
+    "credit_hour": 1.0,
+    "pre_requisite": [],
+    "course_type": "UR",
+    "course_semester": null,
+    "course_desc": null,
+    "course_department": ["CEE"]
+  },
+  {
+    "course_code": "KFA101F",
+    "course_name": "Culinary Arts",
+    "credit_hour": 1.0,
+    "pre_requisite": [],
+    "course_type": "UR",
+    "course_semester": null,
+    "course_desc": null,
+    "course_department": ["CEE"]
+  },
+  {
+    "course_code": "KFA102F",
+    "course_name": "Lights, Camera, Action!",
+    "credit_hour": 1.0,
+    "pre_requisite": [],
+    "course_type": "UR",
+    "course_semester": null,
+    "course_desc": null,
+    "course_department": ["CEE"]
+  },
+  {
+    "course_code": "KFA103F",
+    "course_name": "Traditional Music",
+    "credit_hour": 1.0,
+    "pre_requisite": [],
+    "course_type": "UR",
+    "course_semester": null,
+    "course_desc": null,
+    "course_department": ["CEE"]
+  },
+  {
+    "course_code": "KFA104F",
+    "course_name": "Let's Dance",
+    "credit_hour": 1.0,
+    "pre_requisite": [],
+    "course_type": "UR",
+    "course_semester": null,
+    "course_desc": null,
+    "course_department": ["CEE"]
+  },
+  {
+    "course_code": "KFA105F",
+    "course_name": "Malaysian Craft",
+    "credit_hour": 1.0,
+    "pre_requisite": [],
+    "course_type": "UR",
+    "course_semester": null,
+    "course_desc": null,
+    "course_department": ["CEE"]
+  },
+  {
+    "course_code": "KFA106F",
+    "course_name": "The Voice",
+    "credit_hour": 1.0,
+    "pre_requisite": [],
+    "course_type": "UR",
+    "course_semester": null,
+    "course_desc": null,
+    "course_department": ["CEE"]
+  },
+  {
+    "course_code": "KFA107F",
+    "course_name": "Doodle Arts",
+    "credit_hour": 1.0,
+    "pre_requisite": [],
+    "course_type": "UR",
+    "course_semester": null,
+    "course_desc": null,
+    "course_department": ["CEE"]
+  },
+  {
+    "course_code": "KFA108F",
+    "course_name": "Calligraphy",
+    "credit_hour": 1.0,
+    "pre_requisite": [],
+    "course_type": "UR",
+    "course_semester": null,
+    "course_desc": null,
+    "course_department": ["CEE"]
+  },
+  {
+    "course_code": "KFA109F",
+    "course_name": "String Ensemble",
+    "credit_hour": 1.0,
+    "pre_requisite": [],
+    "course_type": "UR",
+    "course_semester": null,
+    "course_desc": null,
+    "course_department": ["CEE"]
+  },
+  {
+    "course_code": "KFA110F",
+    "course_name": "Creative Writing",
+    "credit_hour": 1.0,
+    "pre_requisite": [],
+    "course_type": "UR",
+    "course_semester": null,
+    "course_desc": null,
+    "course_department": ["CEE"]
+  },
+  {
+    "course_code": "KFS101F",
+    "course_name": "Outdoor Recreation",
+    "credit_hour": 1.0,
+    "pre_requisite": [],
+    "course_type": "UR",
+    "course_semester": null,
+    "course_desc": null,
+    "course_department": ["CEE"]
+  },
+  {
+    "course_code": "KFS102F",
+    "course_name": "Fencing",
+    "credit_hour": 1.0,
+    "pre_requisite": [],
+    "course_type": "UR",
+    "course_semester": null,
+    "course_desc": null,
+    "course_department": ["CEE"]
+  },
+  {
+    "course_code": "KFS103F",
+    "course_name": "Aerobic Dance",
+    "credit_hour": 1.0,
+    "pre_requisite": [],
+    "course_type": "UR",
+    "course_semester": null,
+    "course_desc": null,
+    "course_department": ["CEE"]
+  },
+  {
+    "course_code": "KFS104F",
+    "course_name": "Shooting",
+    "credit_hour": 1.0,
+    "pre_requisite": [],
+    "course_type": "UR",
+    "course_semester": null,
+    "course_desc": null,
+    "course_department": ["CEE"]
+  },
+  {
+    "course_code": "KFS105F",
+    "course_name": "Golf",
+    "credit_hour": 1.0,
+    "pre_requisite": [],
+    "course_type": "UR",
+    "course_semester": null,
+    "course_desc": null,
+    "course_department": ["CEE"]
+  },
+  {
+    "course_code": "KFS106F",
+    "course_name": "Mixed Martial Arts",
+    "credit_hour": 1.0,
+    "pre_requisite": [],
+    "course_type": "UR",
+    "course_semester": null,
+    "course_desc": null,
+    "course_department": ["CEE"]
+  },
+  {
+    "course_code": "KFS107F",
+    "course_name": "Wall Climbing",
+    "credit_hour": 1.0,
+    "pre_requisite": [],
+    "course_type": "UR",
+    "course_semester": null,
+    "course_desc": null,
+    "course_department": ["CEE"]
+  },
+  {
+    "course_code": "KFS108F",
+    "course_name": "Scuba Diving",
+    "credit_hour": 1.0,
+    "pre_requisite": [],
+    "course_type": "UR",
+    "course_semester": null,
+    "course_desc": null,
+    "course_department": ["CEE"]
+  },
+  {
+    "course_code": "KFS109F",
+    "course_name": "Sports First Aider",
+    "credit_hour": 1.0,
+    "pre_requisite": [],
+    "course_type": "UR",
+    "course_semester": null,
+    "course_desc": null,
+    "course_department": ["CEE"]
+  },
+  {
+    "course_code": "KFS110F",
+    "course_name": "Sports Management",
+    "credit_hour": 1.0,
+    "pre_requisite": [],
+    "course_type": "UR",
+    "course_semester": null,
+    "course_desc": null,
+    "course_department": ["CEE"]
+  },
+  {
+    "course_code": "MPU3152",
+    "course_name": "Penghayatan Etika dan Peradaban",
+    "credit_hour": 2.0,
+    "pre_requisite": [],
+    "course_type": "NR",
+    "course_semester": null,
+    "course_desc": null,
+    "course_department": ["CEE"]
+  },
+  {
+    "course_code": "MPU3183",
+    "course_name": "Integriti Dan Antirasuah (Integrity And Anti-Corruption)",
+    "credit_hour": 2.0,
+    "pre_requisite": [],
+    "course_type": "NR",
+    "course_semester": null,
+    "course_desc": null,
+    "course_department": ["CEE"]
+  },
+  {
+    "course_code": "HFB1012",
+    "course_name": "Community Engagement Project",
+    "credit_hour": 2.0,
+    "pre_requisite": [],
+    "course_type": "NR",
+    "course_semester": null,
+    "course_desc": null,
+    "course_department": ["CEE"]
+  },
+  {
+    "course_code": "HFB2042",
+    "course_name": "Islamic Critical Thinking",
+    "credit_hour": 2.0,
+    "pre_requisite": [],
+    "course_type": "NR",
+    "course_semester": null,
+    "course_desc": null,
+    "course_department": ["CEE"]
+  },
+  {
+    "course_code": "HFB2052",
+    "course_name": "Islamic and Contemporary Leadership",
+    "credit_hour": 2.0,
+    "pre_requisite": [],
+    "course_type": "NR",
+    "course_semester": null,
+    "course_desc": null,
+    "course_department": ["CEE"]
+  },
+  {
+    "course_code": "HFB2062",
+    "course_name": "Stress Management Skills",
+    "credit_hour": 2.0,
+    "pre_requisite": [],
+    "course_type": "NR",
+    "course_semester": null,
+    "course_desc": null,
+    "course_department": ["CEE"]
+  },
+  {
+    "course_code": "HFB2072",
+    "course_name": "Innovation and Creativity Skills",
+    "credit_hour": 2.0,
+    "pre_requisite": [],
+    "course_type": "NR",
+    "course_semester": null,
+    "course_desc": null,
+    "course_department": ["CEE"]
+  },
+  {
+    "course_code": "HFB2082",
+    "course_name": "Problem Solving and Decision Making",
+    "credit_hour": 2.0,
+    "pre_requisite": [],
+    "course_type": "NR",
+    "course_semester": null,
+    "course_desc": null,
+    "course_department": ["CEE"]
+  },
+  {
+    "course_code": "LFB2012",
+    "course_name": "Basic Arabic Communication",
+    "credit_hour": 2.0,
+    "pre_requisite": [],
+    "course_type": "NR",
+    "course_semester": null,
+    "course_desc": null,
+    "course_department": ["CEE"]
+  },
+  {
+    "course_code": "LFB2022",
+    "course_name": "Basic Mandarin Communication",
+    "credit_hour": 2.0,
+    "pre_requisite": [],
+    "course_type": "NR",
+    "course_semester": null,
+    "course_desc": null,
+    "course_department": ["CEE"]
+  },
+  {
+    "course_code": "LFB2032",
+    "course_name": "Bahasa Kebangsaan A",
+    "credit_hour": 2.0,
+    "pre_requisite": [],
+    "course_type": "NR",
+    "course_semester": null,
+    "course_desc": null,
+    "course_department": ["CEE"]
+  },
+  {
+    "course_code": "LFB2042",
+    "course_name": "Technical Writing",
+    "credit_hour": 2.0,
+    "pre_requisite": [],
+    "course_type": "NR",
+    "course_semester": null,
+    "course_desc": null,
+    "course_department": ["CEE"]
+  },
+  {
+    "course_code": "LFB2052",
+    "course_name": "Basic Korean Communication",
+    "credit_hour": 2.0,
+    "pre_requisite": [],
+    "course_type": "NR",
+    "course_semester": null,
+    "course_desc": null,
+    "course_department": ["CEE"]
+  },
+  {
+    "course_code": "LFB2062",
+    "course_name": "Basic French Communication",
+    "credit_hour": 2.0,
+    "pre_requisite": [],
+    "course_type": "NR",
+    "course_semester": null,
+    "course_desc": null,
+    "course_department": ["CEE"]
+  },
+  {
+    "course_code": "LFB2072",
+    "course_name": "Basic Spanish Communication",
+    "credit_hour": 2.0,
+    "pre_requisite": [],
+    "course_type": "NR",
+    "course_semester": null,
+    "course_desc": null,
+    "course_department": ["CEE"]
+  },
+  {
+    "course_code": "LFB2082",
+    "course_name": "Basic Japanese Communication",
+    "credit_hour": 2.0,
+    "pre_requisite": [],
+    "course_type": "NR",
+    "course_semester": null,
+    "course_desc": null,
+    "course_department": ["CEE"]
+  },
+  {
+    "course_code": "GFB2092",
+    "course_name": "Business Ventures",
+    "credit_hour": 2.0,
+    "pre_requisite": [],
+    "course_type": "NR",
+    "course_semester": null,
+    "course_desc": null,
+    "course_department": ["CEE"]
+  },
+  {
+    "course_code": "GFB1033",
+    "course_name": "Management and Organisational Behaviour",
+    "credit_hour": 3.0,
+    "pre_requisite": [],
+    "course_type": "EM",
+    "course_semester": null,
+    "course_desc": null,
+    "course_department": ["CEE"]
+  },
+  {
+    "course_code": "GFB2043",
+    "course_name": "Principles of Marketing",
+    "credit_hour": 3.0,
+    "pre_requisite": [],
+    "course_type": "EM",
+    "course_semester": null,
+    "course_desc": null,
+    "course_department": ["CEE"]
+  },
+  {
+    "course_code": "GFB3113",
+    "course_name": "Corporate Communication",
+    "credit_hour": 3.0,
+    "pre_requisite": [],
+    "course_type": "EM",
+    "course_semester": null,
+    "course_desc": null,
+    "course_department": ["CEE"]
+  },
+  {
+    "course_code": "GFB3093",
+    "course_name": "Strategic Management",
+    "credit_hour": 3.0,
+    "pre_requisite": [],
+    "course_type": "EM",
+    "course_semester": null,
+    "course_desc": null,
+    "course_department": ["CEE"]
+  },
+  {
+    "course_code": "GFB3073",
+    "course_name": "Human Resource Management",
+    "credit_hour": 3.0,
+    "pre_requisite": [],
+    "course_type": "EM",
+    "course_semester": null,
+    "course_desc": null,
+    "course_department": ["CEE"]
+  },
+  {
+    "course_code": "GFB2053",
+    "course_name": "Principles of Finance",
+    "credit_hour": 3.0,
+    "pre_requisite": [],
+    "course_type": "EM",
+    "course_semester": null,
+    "course_desc": null,
+    "course_department": ["CEE"]
+  },
+  {
+    "course_code": "GFB2013",
+    "course_name": "Business Accounting",
+    "credit_hour": 3.0,
+    "pre_requisite": [],
+    "course_type": "EM",
+    "course_semester": null,
+    "course_desc": null,
+    "course_department": ["CEE"]
+  },
+  {
+    "course_code": "GFB2113",
+    "course_name": "Fundamental to Investment",
+    "credit_hour": 3.0,
+    "pre_requisite": [],
+    "course_type": "EM",
+    "course_semester": null,
+    "course_desc": null,
+    "course_department": ["CEE"]
+  },
+  {
+    "course_code": "GFB3033",
+    "course_name": "Corporate Finance",
+    "credit_hour": 3.0,
+    "pre_requisite": [],
+    "course_type": "EM",
+    "course_semester": null,
+    "course_desc": null,
+    "course_department": ["CEE"]
+  },
+  {
+    "course_code": "GFB3043",
+    "course_name": "International Financial Management",
+    "credit_hour": 3.0,
+    "pre_requisite": [],
+    "course_type": "EM",
+    "course_semester": null,
+    "course_desc": null,
+    "course_department": ["CEE"]
+  },
+  {
+    "course_code": "GEB2153",
+    "course_name": "Business Law",
+    "credit_hour": 3.0,
+    "pre_requisite": [],
+    "course_type": "EM",
+    "course_semester": null,
+    "course_desc": null,
+    "course_department": ["CEE"]
+  },
+  {
+    "course_code": "GFB2283",
+    "course_name": "Business and Financial Technology",
+    "credit_hour": 3.0,
+    "pre_requisite": [],
+    "course_type": "EM",
+    "course_semester": null,
+    "course_desc": null,
+    "course_department": ["CEE"]
+  },
+  {
+    "course_code": "GFB2293",
+    "course_name": "Management Accounting",
+    "credit_hour": 3.0,
+    "pre_requisite": [],
+    "course_type": "EM",
+    "course_semester": null,
+    "course_desc": null,
+    "course_department": ["CEE"]
+  },
+  {
+    "course_code": "GDB1033",
+    "course_name": "Management and Organisational Behaviour",
+    "credit_hour": 3.0,
+    "pre_requisite": [],
+    "course_type": "EM",
+    "course_semester": null,
+    "course_desc": null,
+    "course_department": ["CEE"]
+  },
+  {
+    "course_code": "GDB2013",
+    "course_name": "Business Accounting",
+    "credit_hour": 3.0,
+    "pre_requisite": [],
+    "course_type": "EM",
+    "course_semester": null,
+    "course_desc": null,
+    "course_department": ["CEE"]
+  },
+  {
+    "course_code": "GDB2043",
+    "course_name": "Principles of Marketing",
+    "credit_hour": 3.0,
+    "pre_requisite": [],
+    "course_type": "EM",
+    "course_semester": null,
+    "course_desc": null,
+    "course_department": ["CEE"]
+  },
+  {
+    "course_code": "GDB2053",
+    "course_name": "Principles of Finance",
+    "credit_hour": 3.0,
+    "pre_requisite": [],
+    "course_type": "EM",
+    "course_semester": null,
+    "course_desc": null,
+    "course_department": ["CEE"]
+  },
+  {
+    "course_code": "GDB3013",
+    "course_name": "Small Business and Entrepreneurship",
+    "credit_hour": 3.0,
+    "pre_requisite": [],
+    "course_type": "EM",
+    "course_semester": null,
+    "course_desc": null,
+    "course_department": ["CEE"]
+  }
 ]

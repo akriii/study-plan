@@ -74,9 +74,13 @@ def calculate_points_and_credits(courses: list):
                 quality_points = 0.00
         # -------------------
 
-        total_credits += credits
-        total_grade_points += (quality_points * credits)
-    
+        # Do not count credit hours for failed courses
+        if isinstance(raw_grade, str) and raw_grade.upper().strip() == "F":
+            total_grade_points += 0
+        else:
+            total_credits += credits
+            total_grade_points += (quality_points * credits)
+            
     return total_grade_points, total_credits
     
 def Calc_Gpa(courses: list):

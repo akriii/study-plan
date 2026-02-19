@@ -108,6 +108,16 @@ async def read_national_requirement(student_id: UUID):
 async def read_common_courses(student_id: UUID):
     return await get_courses_by_student_context(student_id, "CC")
 
+@router.get("/get/ElectiveMinor/{student_id}")
+async def read_elective_minor(student_id: UUID):
+    return await get_courses_by_student_context(student_id, "EM")
+
+@router.get("/get/CourseIntern/{student_id}")
+async def read_course_intern(student_id: UUID):
+    return await get_courses_by_student_context(student_id, "CI")
+
+
+
 #get specific course information
 @router.get("/get/{course_code}", response_model=list[CourseRead]) #@router is a sub mdodule of FastAPI to handle routes
 async def get_specific_course(course_code:str):
@@ -193,6 +203,14 @@ async def read_available_ur(student_id: UUID):
 @router.get("/get/CourseAvailable/CommonCourse/{student_id}", response_model=list[CourseRead])
 async def read_available_cc(student_id: UUID):
     return await get_available_courses_by_type(student_id, "CC")
+
+@router.get("/get/CourseAvailable/ElectiveMinor/{student_id}", response_model=list[CourseRead])
+async def read_available_em(student_id: UUID):
+    return await get_available_courses_by_type(student_id, "EM")
+
+@router.get("/get/CourseAvailable/CourseIntern/{student_id}", response_model=list[CourseRead])
+async def read_available_ci(student_id: UUID):
+    return await get_available_courses_by_type(student_id, "CI")
 
 
 #get all courses by department
