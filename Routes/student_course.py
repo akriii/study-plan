@@ -47,7 +47,7 @@ async def get_academic_standing(student_id: UUID, semester: int):
         .eq("student_id", student_id) \
         .eq("semester", semester).execute()
     
-    _, enrolled_credits = calculate_points_and_credits(current_sem_res.data)
+    enrolled_credits = TotalCreditHour(current_sem_res.data)
 
     return {
         "semester": semester,
