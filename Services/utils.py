@@ -41,6 +41,21 @@ def HashPassword(password:str):
 def VerifyPassword(plain_password:str, hashed_password:str):
     return pwd_context.verify(plain_password,hashed_password)
 
+def TotalCreditHour(courses: list):
+
+    total_earned_credits = 0 # Credits that actually count toward graduation
+
+    for item in courses:
+        course_info = item.get("COURSE") or {}
+        base_credits = item.get("credit_hour") or course_info.get("credit_hour", 0)
+        raw_grade = item.get("grade", "").upper().strip() if item.get("grade") else ""
+
+        
+        if raw_grade != "F" and raw_grade != "":
+            total_earned_credits += base_credits
+                   
+    return total_earned_credits
+
 
 def calculate_points_and_credits(courses: list):
     """Calculates total grade points and credits for a given list of courses."""

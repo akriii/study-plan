@@ -1,7 +1,7 @@
 from fastapi import FastAPI,APIRouter, HTTPException
 from Database.database import SUPABASE
 from Model.models import   Summary, StudentCourseAdd, ReadSemesterCourse, UpdateStudentCourse, SemesterRemove, Gpa
-from Services.utils import Calc_Cgpa, Get_Probation_Status, calculate_points_and_credits
+from Services.utils import Calc_Cgpa, Get_Probation_Status, calculate_points_and_credits, TotalCreditHour
 from uuid import UUID
 import copy
 
@@ -239,6 +239,7 @@ async def get_student_summary(student_id: UUID):
             "count_current_course": 0, 
             "count_planned_course": 0, 
             "student_cgpa": 0.0,
+            "total_credit_hour": 0,
             "semester_credits": {},
             "academic_meta": {
                 "is_probation": False,
@@ -269,6 +270,7 @@ async def get_student_summary(student_id: UUID):
 
     # 3. CGPA Calculation
     cgpa = Calc_Cgpa(completed_list)
+    total_earned = TotalCreditHour(completed_list)
 
     try:
         # Convert keys to int to find max, then back to string
@@ -283,6 +285,7 @@ async def get_student_summary(student_id: UUID):
         "count_current_course": len(current_list),
         "count_planned_course": len(planned_list),
         "student_cgpa": cgpa,
+        "total_credit_hour": total_earned,
         "semester_credits": sem_credits,
         "academic_meta": {
             "is_probation": is_probation,

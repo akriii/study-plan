@@ -41,6 +41,7 @@ class Summary(BaseModel):
     count_current_course: int
     count_planned_course: int
     student_cgpa: float
+    total_credit_hour: int
     semester_credits: dict[str, int]
     academic_meta: AcademicMeta 
 
