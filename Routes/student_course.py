@@ -3,6 +3,7 @@ from Database.database import SUPABASE
 from Model.models import   Summary, StudentCourseAdd, ReadSemesterCourse, UpdateStudentCourse, SemesterRemove, Gpa
 from Services.utils import Calc_Cgpa, Get_Probation_Status, calculate_points_and_credits
 from uuid import UUID
+import copy
 
 router = APIRouter()
 #get list of course taken by each semester
@@ -14,8 +15,24 @@ async def get_semester_course(student_id: UUID, semester: int):
     .eq("semester", semester) \
     .execute()
     if not response.data:
-        return []
-    return response.data
+        raise HTTPException(status_code=404, detail="Record not found")
+
+
+    final_results = []
+
+    for record in response.data:
+        # 1. Grab the grade and the nested COURSE dict
+        grade = record.get("grade")
+        course_info = record.get("COURSE")
+
+        # 2. If grade is F, we modify the dictionary directly inside the record
+        if course_info and grade == "F":
+            course_info["credit_hour"] = 0.0
+            # Optional Debug: print(f"DEBUG: Setting {record['course_code']} credits to 0")
+
+        final_results.append(record)
+
+    return final_results
 
 @router.get("/get/Standing/{student_id}/{semester}")
 async def get_academic_standing(student_id: UUID, semester: int):
@@ -54,13 +71,28 @@ async def read_student_course_specific(student_id: UUID, course_code: str, semes
         
     if not response.data:
         raise HTTPException(status_code=404, detail="Record not found")
-    return response.data
+
+
+    final_results = []
+
+    for record in response.data:
+        # 1. Grab the grade and the nested COURSE dict
+        grade = record.get("grade")
+        course_info = record.get("COURSE")
+
+        # 2. If grade is F, we modify the dictionary directly inside the record
+        if course_info and grade == "F":
+            course_info["credit_hour"] = 0.0
+            # Optional Debug: print(f"DEBUG: Setting {record['course_code']} credits to 0")
+
+        final_results.append(record)
+
+    return final_results
 
 
 #route to get all course student_course data
 @router.get("/get/{student_id}", response_model=list[ReadSemesterCourse]) 
 async def read_student_course_all(student_id: UUID):
-    # 1. Fetch data as usual
     response = SUPABASE.table("STUDENT_COURSE") \
         .select("*, COURSE(course_code, course_name, credit_hour, course_type, pre_requisite, course_semester, course_desc, course_department)") \
         .eq("student_id", student_id) \
@@ -69,20 +101,22 @@ async def read_student_course_all(student_id: UUID):
     if not response.data:
         raise HTTPException(status_code=404, detail="Record not found")
 
-    # 2. Modify results based on grade
-    modified_data = []
-    for record in response.data:
-        # Get the nested COURSE object
-        course_info = record.get("COURSE")
-        
-        # Check if course_info exists and if the grade is 'F'
-        if course_info and record.get("grade") == "F":
-            # Set credit_hour to 0 for this specific instance (doesn't change the DB)
-            course_info["credit_hour"] = 0
-        
-        modified_data.append(record)
 
-    return modified_data
+    final_results = []
+
+    for record in response.data:
+        # 1. Grab the grade and the nested COURSE dict
+        grade = record.get("grade")
+        course_info = record.get("COURSE")
+
+        # 2. If grade is F, we modify the dictionary directly inside the record
+        if course_info and grade == "F":
+            course_info["credit_hour"] = 0.0
+            # Optional Debug: print(f"DEBUG: Setting {record['course_code']} credits to 0")
+
+        final_results.append(record)
+
+    return final_results
 
 #add new student_course based on pre-requisite
 @router.post("/add")
