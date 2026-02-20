@@ -258,6 +258,12 @@ async def get_student_summary(student_id: UUID):
     for record in all_data:
         sem = str(record.get("semester")) 
         course_info = record.get("COURSE") or {}
+        grade = record.get("grade")
+
+        # 2. If grade is F, we modify the dictionary directly inside the record
+        if course_info and grade == "F":
+            course_info["credit_hour"] = 0.0
+        
         credits = course_info.get("credit_hour", 0)
         sem_credits[sem] = sem_credits.get(sem, 0) + credits
 
