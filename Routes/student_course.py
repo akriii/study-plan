@@ -59,12 +59,30 @@ async def read_student_course_specific(student_id: UUID, course_code: str, semes
 
 #route to get all course student_course data
 @router.get("/get/{student_id}", response_model=list[ReadSemesterCourse]) 
-async def read_student_course_all(student_id:UUID):
-    response = SUPABASE.table("STUDENT_COURSE").select("*, COURSE(course_code,course_name, credit_hour, course_type, pre_requisite, course_semester, course_desc, course_department)").eq("student_id",student_id).execute()
+async def read_student_course_all(student_id: UUID):
+    # 1. Fetch data as usual
+    response = SUPABASE.table("STUDENT_COURSE") \
+        .select("*, COURSE(course_code, course_name, credit_hour, course_type, pre_requisite, course_semester, course_desc, course_department)") \
+        .eq("student_id", student_id) \
+        .execute()
+    
     if not response.data:
         raise HTTPException(status_code=404, detail="Record not found")
-    return response.data
 
+    # 2. Modify results based on grade
+    modified_data = []
+    for record in response.data:
+        # Get the nested COURSE object
+        course_info = record.get("COURSE")
+        
+        # Check if course_info exists and if the grade is 'F'
+        if course_info and record.get("grade") == "F":
+            # Set credit_hour to 0 for this specific instance (doesn't change the DB)
+            course_info["credit_hour"] = 0
+        
+        modified_data.append(record)
+
+    return modified_data
 
 #add new student_course based on pre-requisite
 @router.post("/add")
