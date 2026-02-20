@@ -250,7 +250,7 @@ async def get_student_summary(student_id: UUID):
         }
 
     # 1. Standard Status Filtering
-    completed_list = [c for c in all_data if c["status"] == "Completed"]
+    completed_list = [c for c in all_data if c["status"] == "Completed" and c["grade"] != "Exemption"]
     current_list = [c for c in all_data if c["status"] == "Current"]
     planned_list = [c for c in all_data if c["status"] == "Planned"]
     
@@ -311,7 +311,23 @@ async def get_semester_gpa(student_id: UUID, semester_id: int):
             "message": "No completed courses found for this semester"
         }
 
-    gpa = Calc_Cgpa(response.data) 
+    # --- THE FIX: Filter out Exemptions ---
+    # We create a new list that only includes courses where grade is NOT 'Exemption'
+    gpa_eligible_courses = [
+        course for course in response.data 
+        if course.get("grade") != "Exemption"
+    ]
+
+    # If all courses in the semester were exemptions, the list will be empty
+    if not gpa_eligible_courses:
+        return {
+            "semester": semester_id,
+            "student_gpa": 0.0,
+            "message": "All courses in this semester are Exemptions (no GPA impact)"
+        }
+
+    # Pass the filtered list to your utility function
+    gpa = Calc_Cgpa(gpa_eligible_courses) 
     
     return {
         "semester": semester_id,
